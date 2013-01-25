@@ -49,12 +49,14 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
     private int _rawFrameDataSize;
 
     private byte[] _RGBA;
+    private byte[] _RGBA_R;
     private byte[] _RGBA_P2;
     private byte[] _frameData;
     private byte[] _callbackBuffer;
 
     private Camera              _camera;
     private int 				_cameraId;
+    private boolean  			_facing;
     private SurfaceHolder       _holder;
     private int                 _frameWidth;
     private int                 _frameHeight;
@@ -219,7 +221,7 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
     {
         _frameDataSize = previewWidth * previewHeight * 4;
         _RGBA = new byte[_frameDataSize + 4096]; // safe
-
+        _RGBA_R = new byte[_frameDataSize + 4096];
         _frameWidth2 = nextPowerOfTwo(_frameWidth);
         _frameHeight2 = nextPowerOfTwo(_frameHeight);
         _frameDataSize2 = _frameWidth2 * _frameHeight2 * 4;
@@ -233,6 +235,7 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
     protected void onPreviewStopped() 
     {
         _RGBA = null;
+        _RGBA_R = null;
         _RGBA_P2 = null;
         isCapturing = false;
 
@@ -240,7 +243,7 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
     }
 
     // DEBUG: Save the first frame
-    private boolean isFirstFrame = true;
+    //private boolean isFirstFrame = true;
 
     protected void processFrame(byte[] data) 
     {
@@ -332,7 +335,21 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void grabFrame(ByteBuffer bytes) {
-    	bytes.put(_RGBA, 0, _frameDataSize);
+    	// Rotate if front side
+    	if (_facing) {
+    		for (int j = 0; j < _frameHeight; j++) {
+    			for (int i = 0; i < _frameWidth; i++) {
+    				int sj = _frameHeight - j;
+    				int si = _frameWidth - i;
+    				int idx = (j * _frameWidth + i) * 4;
+    				int srcIdx = (sj * _frameWidth + si) * 4;
+    				System.arraycopy(_RGBA, srcIdx, _RGBA_R, idx, 4);
+    			}
+    		}
+    		bytes.put(_RGBA_R, 0, _frameDataSize);
+    	} else {
+    		bytes.put(_RGBA, 0, _frameDataSize);
+    	}
     }
 
     public void grabP2Frame(ByteBuffer bytes, int w2, int h2)
@@ -398,7 +415,7 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
         {
-            _camera.setPreviewTexture( new SurfaceTexture(10) );
+            _camera.setPreviewTexture( new SurfaceTexture(10));
         } else {
             _camera.setPreviewDisplay(null);
         }
@@ -594,7 +611,8 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
         	Camera.CameraInfo info = new Camera.CameraInfo();
         	Camera.getCameraInfo(index, info);
         	int orientation = info.orientation;
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+        	_facing = (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT);
+            if (_facing) {
                 _camera.setDisplayOrientation(360 - orientation);
             } else {
             	_camera.setDisplayOrientation(orientation);
