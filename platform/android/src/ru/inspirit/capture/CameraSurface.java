@@ -81,6 +81,18 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
     private native static void disposeConvert();
     //
     
+    public static void nativeSetupConvert(int width, int height) {
+    	setupConvert(width, height);
+    }
+    
+    public static void nativeConvert(byte[] input, byte[] output, int width, int height, int format) {
+    	convert(input, output, width, height, format);
+    }
+    
+    public static void nativeDisposeConvert() {
+    	disposeConvert();
+    }
+    
 	private Camera.ShutterCallback mShutterHandler = new Camera.ShutterCallback() {
 		@Override
 		public void onShutter() {
