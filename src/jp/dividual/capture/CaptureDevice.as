@@ -1,27 +1,23 @@
-package ru.inspirit.capture{
+package jp.dividual.capture {
 	import flash.display.BitmapData;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
-	import flash.geom.Rectangle;
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
-	import flash.system.Capabilities;
 
-	/**
-	* Class for video capturing from cameras
-	* @author Eugene Zatepyakin
-	*/
-	
 	public final class CaptureDevice extends EventDispatcher{
 		internal static var _context:ExtensionContext;
-
 
 		// Flash mode
 		public static const FLASH_MODE_OFF:int = 0;
 		public static const FLASH_MODE_ON:int = 1;
 		public static const FLASH_MODE_AUTO:int = 2;
+		
+		public static const ANDROID_STILL_IMAGE_QUALITY_LOW:int = 0;
+		public static const ANDROID_STILL_IMAGE_QUALITY_MEDIUM:int = 1;
+		public static const ANDROID_STILL_IMAGE_QUALITY_BEST:int = 2;
 		
 		// events
 		public static const EVENT_IMAGE_SAVED:String = 'IMAGE_SAVED';
@@ -31,34 +27,57 @@ package ru.inspirit.capture{
 		
 		public var bmp:BitmapData;
 
-	
-		/**
-		* Initialize native side and prepare internal buffer.
-		*/
-		public static function initialize():void{
-			if (!_context){
-				_context = ExtensionContext.createExtensionContext("ru.inspirit.capture", null);
+		private var _index:int;
+		private var _width:int;
+		private var _height:int;
+		private var _fps:int;
+		
+		public function CaptureDevice(cameraIndex:int, width:int, height:int, fps:int=15) {
+			if (!_context) {
+				_context = ExtensionContext.createExtensionContext("jp.dividual.capture", null);
 			}
-		}
 
+			_index = cameraIndex;
+			_width = width;
+			_height = height;
+			_fps = fps;
+		}
+		
 		// [静的] [読み取り専用] 使用可能なすべてのカメラの名前が含まれるストリング配列です。
 		public static function get names():Array{
-			_context.call( 'getNames' );
-			return null;
+			if (!_context) {
+				_context = ExtensionContext.createExtensionContext("jp.dividual.capture", null);
+			}
+
+			var infoBuffer:ByteArray = new ByteArray();
+			infoBuffer.endian = Endian.LITTLE_ENDIAN;
+			infoBuffer.length = 64 * 1024;
+			_context.call('listDevices', infoBuffer);
+			
+			var n:int = infoBuffer.readInt();
+			var ret:Array = new Array(n);
+			for (var i:int = 0; i < n; i++) {
+				var nameLength:int = infoBuffer.readInt();
+				var name:String = infoBuffer.readUTFBytes(nameLength);
+				ret[i] = name;
+			}
+			return ret;
 		}
 
-		// [静的] ビデオをキャプチャする CaptureDevice オブジェクトへの参照を返します。
-		public static function getDevice( name:String, width:uint, height:uint ):CaptureDevice{
-			_context.call( 'getDevice', name, width, height );
-			return null;
-		}
-
-		
 		/**
 		 * Begin capturing video
 		 */
-		public function startCapturing():void{
-			_context.call( 'startCapturing' );
+		public function startCapturing():void {
+			var infoBuffer:ByteArray = new ByteArray();
+			infoBuffer.endian = Endian.LITTLE_ENDIAN;
+			infoBuffer.length = 64 * 1024;
+
+			_context.call('startCamera', _index, _width, _height, _fps, infoBuffer, ANDROID_STILL_IMAGE_QUALITY_BEST);
+			var width:int = infoBuffer.readInt();
+			var height:int = infoBuffer.readInt();
+			_width = width;
+			_height = height;
+			bmp = new BitmapData(_width, _height, false, 0x0);
 			_context.addEventListener(StatusEvent.STATUS, onMiscStatus);
 		}
 		
@@ -66,7 +85,7 @@ package ru.inspirit.capture{
 		 * Stop capturing video
 		 */
 		public function stopCapturing():void{
-			_context.call('stopCapturing' );
+			_context.call('endCamera' );
 			_context.removeEventListener(StatusEvent.STATUS, onMiscStatus);
 		}
 
@@ -89,9 +108,9 @@ package ru.inspirit.capture{
 		
 		// フレーム画像を要求する
 		// 更新されていたら true を返し、bmp プロパティを書き換える
-		public function requestFrame():Boolean{
-			var isNewFrame:int = _context.call( 'requestFrame', bmp ) as int;
-			return isNewFrame == 1;
+		public function requestFrame():Boolean {
+			var isNewFrame:int = _context.call('requestFrame', bmp) as int;
+			return (isNewFrame == 1);
 		}
 		
 

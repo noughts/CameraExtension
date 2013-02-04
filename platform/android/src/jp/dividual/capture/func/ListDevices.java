@@ -28,7 +28,7 @@ public class ListDevices implements FREFunction {
         ByteBuffer bytes;
 
         try {
-            info = (FREByteArray)args[1];
+            info = (FREByteArray)args[0];
             info.acquire();
             bytes = info.getBytes();
             bytes.order(ByteOrder.LITTLE_ENDIAN);

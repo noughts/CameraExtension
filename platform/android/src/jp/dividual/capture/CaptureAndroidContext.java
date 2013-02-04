@@ -9,7 +9,9 @@ import jp.dividual.capture.func.ExposureAtPoint;
 import jp.dividual.capture.func.FocusAtPoint;
 import jp.dividual.capture.func.GetFlashMode;
 import jp.dividual.capture.func.ListDevices;
+import jp.dividual.capture.func.RequestFrame;
 import jp.dividual.capture.func.SetFlashMode;
+import jp.dividual.capture.func.StartCamera;
 import jp.dividual.capture.func.ToggleCapturingFunction;
 
 
@@ -18,28 +20,29 @@ import com.adobe.fre.FREFunction;
 
 public class CaptureAndroidContext extends FREContext {
 	
-	private CameraSurfaceView mSurface = null;
+	private static CameraSurfaceView sSurface = null;
 
-	public void setCameraSurface(CameraSurfaceView surface) {
-		mSurface = surface;
+	public static void setCameraSurface(CameraSurfaceView surface) {
+		sSurface = surface;
 	}
 	
-	public CameraSurfaceView getCameraSurface() {
-		return mSurface;
+	public static CameraSurfaceView getCameraSurface() {
+		return sSurface;
 	}
 	
 	@Override
 	public void dispose() {
-		if (mSurface != null) {
-			mSurface.endCamera();
+		if (sSurface != null) {
+			sSurface.endCamera();
         }
 	}
 
 	@Override
 	public Map<String, FREFunction> getFunctions() {
 		Map<String, FREFunction> map = new HashMap<String, FREFunction>();
-		
+		map.put(StartCamera.KEY, new StartCamera());
 		map.put(EndCamera.KEY, new EndCamera());
+		map.put(RequestFrame.KEY, new RequestFrame());
 		map.put(ListDevices.KEY, new ListDevices());
 		map.put(ToggleCapturingFunction.KEY, new ToggleCapturingFunction());
 		map.put(FocusAtPoint.KEY, new FocusAtPoint());

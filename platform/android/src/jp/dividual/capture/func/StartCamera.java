@@ -31,8 +31,8 @@ public class StartCamera implements FREFunction {
 	        int fps = args[3].getAsInt();
 	        int pictureQuality = args[5].getAsInt();
 	
-	        surfaceView = new CameraSurfaceView(context.getActivity());
-	        ((CaptureAndroidContext)context).setCameraSurface(surfaceView);
+	        surfaceView = new CameraSurfaceView(context);
+	        CaptureAndroidContext.setCameraSurface(surfaceView);
 	        context.getActivity().setContentView(surfaceView);
 	        
 	        Log.d(TAG, "Starting... (" + width + ", " + height + ", " + fps + ", " + pictureQuality + ")");
@@ -43,7 +43,6 @@ public class StartCamera implements FREFunction {
 	        ByteBuffer bytes = info.getBytes();
 	        bytes.order(ByteOrder.LITTLE_ENDIAN);
 	
-	        bytes.putInt(0);
 	        bytes.putInt(surfaceView.getFrameWidth());
 	        bytes.putInt(surfaceView.getFrameHeight());
 	        
@@ -53,7 +52,7 @@ public class StartCamera implements FREFunction {
 	
 	        if (surfaceView != null) {
 	            surfaceView.endCamera();
-		        ((CaptureAndroidContext)context).setCameraSurface(null);
+		        CaptureAndroidContext.setCameraSurface(null);
 	        }
 	
 	        try {

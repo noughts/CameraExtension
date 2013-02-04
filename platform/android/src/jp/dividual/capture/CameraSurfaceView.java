@@ -61,6 +61,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
     private Camera mCamera;
     private SurfaceHolder mHolder;
+    private FREContext mContext;
     
     private boolean mFacing;
     private boolean	mFirstFrame;
@@ -92,7 +93,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         	
         	if (mFirstFrame == true) {
         		mFirstFrame = false;
-        		CameraSurface.captureContext.dispatchStatusEventAsync(EVENT_PREVIEW_READY, "0");
+        		mContext.dispatchStatusEventAsync(EVENT_PREVIEW_READY, "0");
         		Log.i(TAG, "Preview Ready");
         	}
             processFrame(data);
@@ -100,9 +101,10 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 		}
 	};
 	
-    public CameraSurfaceView(Context context) {
-        super(context);
+    public CameraSurfaceView(FREContext context) {
+        super(context.getActivity());
 
+        mContext = context;
         mHolder = getHolder();
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -209,7 +211,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         mCamera.autoFocus(new Camera.AutoFocusCallback() {
                 @Override
                 public void onAutoFocus(boolean success, Camera camera) {
-                	CameraSurface.captureContext.dispatchStatusEventAsync(EVENT_FOCUS_COMPLETE, "0");
+                	mContext.dispatchStatusEventAsync(EVENT_FOCUS_COMPLETE, "0");
                 }
         });
     }
@@ -291,7 +293,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 			        } catch (IOException e) {
 			            Log.d(TAG, "Error accessing file: " + e.getMessage());
 			        }
-			        //CameraSurface.captureContext.dispatchStatusEventAsync( EVENT_IMAGE_SAVED, "0" );
+			        mContext.dispatchStatusEventAsync( EVENT_IMAGE_SAVED, "0" );
 			        // resume camera
 			        startPreview();
 				}
