@@ -3,6 +3,8 @@ package jp.dividual.capture;
 import java.util.HashMap;
 import java.util.Map;
 
+import ru.inspirit.capture.CameraSurface;
+
 import jp.dividual.capture.func.CaptureAndSaveImage;
 import jp.dividual.capture.func.EndCamera;
 import jp.dividual.capture.func.ExposureAtPoint;
@@ -12,7 +14,7 @@ import jp.dividual.capture.func.ListDevices;
 import jp.dividual.capture.func.RequestFrame;
 import jp.dividual.capture.func.SetFlashMode;
 import jp.dividual.capture.func.StartCamera;
-import jp.dividual.capture.func.ToggleCapturingFunction;
+import jp.dividual.capture.func.FlipCameraFunction;
 
 
 import com.adobe.fre.FREContext;
@@ -44,7 +46,7 @@ public class CaptureAndroidContext extends FREContext {
 		map.put(EndCamera.KEY, new EndCamera());
 		map.put(RequestFrame.KEY, new RequestFrame());
 		map.put(ListDevices.KEY, new ListDevices());
-		map.put(ToggleCapturingFunction.KEY, new ToggleCapturingFunction());
+		map.put(FlipCameraFunction.KEY, new FlipCameraFunction());
 		map.put(FocusAtPoint.KEY, new FocusAtPoint());
 		map.put(ExposureAtPoint.KEY, new ExposureAtPoint());
 		map.put(GetFlashMode.KEY, new GetFlashMode());

@@ -132,7 +132,17 @@ package jp.dividual.capture {
 		
 		// カメラを順番に切り替える
 		public function toggleDevice():void{
-			_context.call( 'toggleDevice' );
+			var infoBuffer:ByteArray = new ByteArray();
+			infoBuffer.endian = Endian.LITTLE_ENDIAN;
+			infoBuffer.length = 64 * 1024;
+			
+			_context.call('flipCamera', infoBuffer);
+			
+			var width:int = infoBuffer.readInt();
+			var height:int = infoBuffer.readInt();
+			_width = width;
+			_height = height;
+			bmp = new BitmapData(_width, _height, false, 0x0);
 		}
 
 
@@ -145,10 +155,12 @@ package jp.dividual.capture {
 		
 		
 		internal function onMiscStatus(e:StatusEvent):void {
-			if (e.code == "FOCUS_COMPLETE") {
+			if (e.code == EVENT_FOCUS_COMPLETE) {
 				dispatchEvent(new Event(EVENT_FOCUS_COMPLETE));
-			} else if (e.code == "PREVIEW_READY") {
+			} else if (e.code == EVENT_PREVIEW_READY) {
 				dispatchEvent(new Event(EVENT_PREVIEW_READY));
+			} else if (e.code == EVENT_IMAGE_SAVED) {
+				dispatchEvent(new Event(EVENT_IMAGE_SAVED));
 			}
 		}
 

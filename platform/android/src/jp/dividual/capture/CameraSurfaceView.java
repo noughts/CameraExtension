@@ -80,14 +80,6 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 		}
 	};
 	
-	private Camera.PictureCallback mPictureHandler = new Camera.PictureCallback() {
-		@Override
-		public void onPictureTaken(byte[] data, Camera camera) {
-	        // resume camera
-	        startPreview();
-		}
-	};
-	
 	private Camera.PreviewCallback mPreviewHandler = new Camera.PreviewCallback() {
 		@Override
 		public void onPreviewFrame(byte[] data, Camera camera) {
@@ -174,14 +166,17 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         
         mYUVData = null;
         mRGBAData = null;
-
-        CameraSurface.nativeDisposeConvert();
+        mRGBARotateData = null;
+        
+        // This call will cause an error on next startCamera()
+        //CameraSurface.nativeDisposeConvert();
     }
     
     public void flipCamera() {
     	int n = Camera.getNumberOfCameras();
     	if (1 < n) {
     		int id = (mCameraId + 1) % n;
+    		endCamera();
     		startCamera(id, mFrameWidth, mFrameHeight, mFPS, mPictureQuality);
     	}
     }
@@ -224,37 +219,22 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     
     public void grabFrame(ByteBuffer bytes) {
     	// Rotate if front side
-    	if (mFacing) {
-    		for (int j = 0; j < mFrameHeight; j++) {
-    			for (int i = 0; i < mFrameWidth; i++) {
-    				int sj = mFrameHeight - j;
-    				int si = mFrameWidth - i;
-    				int idx = (j * mFrameWidth + i) * 4;
-    				int srcIdx = (sj * mFrameWidth + si) * 4;
-    				System.arraycopy(mRGBAData, srcIdx, mRGBARotateData, idx, 4);
-    			}
-    		}
-    		bytes.put(mRGBARotateData, 0, mRGBADataSize);
-    	} else {
-    		bytes.put(mRGBAData, 0, mRGBADataSize);
-    	}
+    	//if (mFacing) {
+    	//	for (int j = 0; j < mFrameHeight; j++) {
+    	//		for (int i = 0; i < mFrameWidth; i++) {
+    	//			int sj = mFrameHeight - j;
+    	//			int si = mFrameWidth - i;
+    	//			int idx = (j * mFrameWidth + i) * 4;
+    	//			int srcIdx = (sj * mFrameWidth + si) * 4;
+    	//			System.arraycopy(mRGBAData, srcIdx, mRGBARotateData, idx, 4);
+    	//		}
+    	//	}
+    	//	bytes.put(mRGBARotateData, 0, mRGBADataSize);
+    	//}
+		bytes.put(mRGBAData, 0, mRGBADataSize);
     	mNewFrame = false;
     }
     
-    public void startTakePicture() {
-        mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                @Override
-                public void onAutoFocus(boolean success, Camera camera) {
-                        takePicture();
-                }
-        });
-    }
-    
-    public void takePicture() {
-        Log.i(TAG, "takePicture");
-        mCamera.takePicture(mShutterHandler, null, mPictureHandler);
-    }
-
     public String getFlashMode() {
     	String ret = null;
     	if (mCamera != null) {
@@ -299,7 +279,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 					        } catch (IOException e) {
 					            Log.d(TAG, "Error accessing file: " + e.getMessage());
 					        }
-					        mContext.dispatchStatusEventAsync( EVENT_IMAGE_SAVED, "0" );
+					        mContext.dispatchStatusEventAsync(EVENT_IMAGE_SAVED, "0");
 					        // resume camera
 					        mCamera.startPreview();
 						}
