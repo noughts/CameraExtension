@@ -7,6 +7,8 @@ import jp.dividual.capture.CameraSurfaceView;
 import jp.dividual.capture.CaptureAndroidContext;
 
 import android.util.Log;
+import android.view.View;
+import android.widget.FrameLayout;
 
 import com.adobe.fre.FREByteArray;
 import com.adobe.fre.FREContext;
@@ -16,7 +18,7 @@ import com.adobe.fre.FREObject;
 public class StartCamera implements FREFunction {
 
 	public static final String KEY ="startCamera";
-
+	
 	private static final String TAG = "StartCameraFunction";
 	
 	@Override
@@ -32,12 +34,15 @@ public class StartCamera implements FREFunction {
 	        int pictureQuality = args[5].getAsInt();
 	
 	        surfaceView = new CameraSurfaceView(context);
-	        CaptureAndroidContext.setCameraSurface(surfaceView);
-	        context.getActivity().setContentView(surfaceView);
+	        ((CaptureAndroidContext)context).setCameraSurface(surfaceView);
 	        
-	        Log.d(TAG, "Starting... (" + width + ", " + height + ", " + fps + ", " + pictureQuality + ")");
+	        // Add SurfaceView to view tree
+	        View focus = context.getActivity().getCurrentFocus();
+	        FrameLayout parent = (FrameLayout)focus.getParent();
+	        surfaceView.setTag(CameraSurfaceView.VIEW_TAG);
+	        parent.addView(surfaceView, 1, 1);
+	        
 	        surfaceView.startCamera(index, width, height, fps, pictureQuality);
-	        Log.d(TAG, "Done.");
 	        
 	        info.acquire();
 	        ByteBuffer bytes = info.getBytes();
@@ -52,7 +57,7 @@ public class StartCamera implements FREFunction {
 	
 	        if (surfaceView != null) {
 	            surfaceView.endCamera();
-		        CaptureAndroidContext.setCameraSurface(null);
+	            ((CaptureAndroidContext)context).setCameraSurface(null);
 	        }
 	
 	        try {

@@ -19,6 +19,12 @@ package jp.dividual.capture {
 		public static const ANDROID_STILL_IMAGE_QUALITY_MEDIUM:int = 1;
 		public static const ANDROID_STILL_IMAGE_QUALITY_BEST:int = 2;
 		
+		// Orientation of picture to be saved
+		public static const ROTATION_0:int = 0;
+		public static const ROTATION_90:int = 1;
+		public static const ROTATION_180:int = 2;
+		public static const ROTATION_270:int = 3;
+		
 		// events
 		public static const EVENT_IMAGE_SAVED:String = 'IMAGE_SAVED';
 		public static const EVENT_CAPTURE_DEVICE_LOST:String = 'CAPTURE_DEVICE_LOST';
@@ -91,8 +97,8 @@ package jp.dividual.capture {
 
 
 		// フォーカスと露出を調整します
-		public function focusAndExposureAtPoint(x:Number = 0.5, y:Number = 0.5):void{
-			_context.call('focusAndExposureAtPoint', x, y);
+		public function focusAndExposureAtPoint(x:Number = 0.5, y:Number = 0.5):void {
+			_context.call('focusAtPoint', x, y);
 		}
 
 		
@@ -109,15 +115,19 @@ package jp.dividual.capture {
 		// フレーム画像を要求する
 		// 更新されていたら true を返し、bmp プロパティを書き換える
 		public function requestFrame():Boolean {
-			var isNewFrame:int = _context.call('requestFrame', bmp) as int;
-			return (isNewFrame == 1);
+			if (_context != null) {
+				var isNewFrame:int = _context.call('requestFrame', bmp) as int;
+				return (isNewFrame == 1);
+			} else {
+				return false;
+			}
 		}
 		
 
 		// フォーカスと露出を合わせて撮影、フルサイズの画像を端末のカメラロールに保存し、withSound が true ならシャッター音を鳴らす
 		// シャッター音は消せない可能性あり。要相談
-		public function shutter( withSoud:Boolean=true ):void{
-			_context.call( 'shutter', withSoud );
+		public function shutter(directoryName:String, pictureOrientation:int, withSound:Boolean=true):void {
+			_context.call('captureAndSaveImage', directoryName, pictureOrientation);
 		}
 		
 		// カメラを順番に切り替える

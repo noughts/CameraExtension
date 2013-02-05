@@ -20,20 +20,20 @@ import com.adobe.fre.FREFunction;
 
 public class CaptureAndroidContext extends FREContext {
 	
-	private static CameraSurfaceView sSurface = null;
+	private CameraSurfaceView mSurface = null;
 
-	public static void setCameraSurface(CameraSurfaceView surface) {
-		sSurface = surface;
+	public void setCameraSurface(CameraSurfaceView surface) {
+		mSurface = surface;
 	}
 	
-	public static CameraSurfaceView getCameraSurface() {
-		return sSurface;
+	public CameraSurfaceView getCameraSurface() {
+		return mSurface;
 	}
 	
 	@Override
 	public void dispose() {
-		if (sSurface != null) {
-			sSurface.endCamera();
+		if (mSurface != null) {
+			mSurface.endCamera();
         }
 	}
 

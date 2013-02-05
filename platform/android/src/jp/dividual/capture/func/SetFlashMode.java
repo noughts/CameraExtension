@@ -21,8 +21,8 @@ public class SetFlashMode implements FREFunction {
         	CaptureAndroidContext ctx = (CaptureAndroidContext)context;
         	CameraSurfaceView cameraSurface = ctx.getCameraSurface();
             if (cameraSurface != null) {
-            	if (args != null && 1 < args.length) {
-                    int code = args[1].getAsInt();
+            	if (args != null && 1 == args.length) {
+                    int code = args[0].getAsInt();
                     String mode = convertFlashModeFromInt(code);
                     if (mode != null) {
                     	cameraSurface.setFlashMode(mode);

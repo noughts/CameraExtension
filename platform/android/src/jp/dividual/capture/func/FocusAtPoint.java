@@ -22,8 +22,8 @@ public class FocusAtPoint implements FREFunction {
         	CameraSurfaceView cameraSurface = ctx.getCameraSurface();
 
             if (cameraSurface != null) {
-                double x = args[1].getAsDouble();
-                double y = args[2].getAsDouble();
+                double x = args[0].getAsDouble();
+                double y = args[1].getAsDouble();
                 cameraSurface.focusAtPoint(x, y);
             }
         } catch(Exception e) {

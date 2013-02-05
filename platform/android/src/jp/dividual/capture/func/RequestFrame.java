@@ -26,7 +26,7 @@ public class RequestFrame implements FREFunction {
         ByteBuffer bytes = null;
         int res = 0;
 
-    	CameraSurfaceView cameraSurface = CaptureAndroidContext.getCameraSurface();
+    	CameraSurfaceView cameraSurface = ((CaptureAndroidContext)context).getCameraSurface();
 
         if (cameraSurface != null && cameraSurface.isNewFrame()) {
             res = 1;

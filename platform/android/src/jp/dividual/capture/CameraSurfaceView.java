@@ -28,6 +28,8 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
 	private static final String TAG = "CameraSurfaceView";
 	
+	public static final String VIEW_TAG = "SurfaceViewTag";
+
 	/**
 	 * Fired when a picture has been saved to the local storage
 	 */
@@ -89,7 +91,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 	private Camera.PreviewCallback mPreviewHandler = new Camera.PreviewCallback() {
 		@Override
 		public void onPreviewFrame(byte[] data, Camera camera) {
-        	Log.d(TAG, "Preview (" + data.length + " bytes)");
+        	//Log.d(TAG, "Preview (" + data.length + " bytes)");
         	
         	if (mFirstFrame == true) {
         		mFirstFrame = false;
@@ -115,7 +117,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         Log.i(TAG, "Instantiated new " + this.getClass());
     }
 
-    public void startCamera(int cameraIndex, int width, int height, int fps, int pictureQuality) {
+	public void startCamera(int cameraIndex, int width, int height, int fps, int pictureQuality) {
 
         if (mCamera != null)  {
             endCamera();
@@ -280,22 +282,28 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 	            return null;
 	        }
 	        setCameraOrientation(orientation);
-    		mCamera.takePicture(mShutterHandler, null, new Camera.PictureCallback() {
+	        // Take picture after auto-focus
+	        mCamera.autoFocus(new Camera.AutoFocusCallback() {
 				@Override
-				public void onPictureTaken(byte[] data, Camera camera) {
-					mImageSaving = false;
-			        try {
-			            FileOutputStream fos = new FileOutputStream(pictureFile);
-			            fos.write(data);
-			            fos.close();
-			        } catch (FileNotFoundException e) {
-			            Log.d(TAG, "File not found: " + e.getMessage());
-			        } catch (IOException e) {
-			            Log.d(TAG, "Error accessing file: " + e.getMessage());
-			        }
-			        mContext.dispatchStatusEventAsync( EVENT_IMAGE_SAVED, "0" );
-			        // resume camera
-			        startPreview();
+				public void onAutoFocus(boolean success, Camera camera) {
+		    		mCamera.takePicture(mShutterHandler, null, new Camera.PictureCallback() {
+						@Override
+						public void onPictureTaken(byte[] data, Camera camera) {
+							mImageSaving = false;
+					        try {
+					            FileOutputStream fos = new FileOutputStream(pictureFile);
+					            fos.write(data);
+					            fos.close();
+					        } catch (FileNotFoundException e) {
+					            Log.d(TAG, "File not found: " + e.getMessage());
+					        } catch (IOException e) {
+					            Log.d(TAG, "Error accessing file: " + e.getMessage());
+					        }
+					        mContext.dispatchStatusEventAsync( EVENT_IMAGE_SAVED, "0" );
+					        // resume camera
+					        mCamera.startPreview();
+						}
+					});
 				}
 			});
     		return pictureFile.getAbsolutePath();
@@ -477,7 +485,6 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)  {
         Log.i(TAG, "surfaceChanged");
-        
         try {
 			mCamera.setPreviewDisplay(mHolder);
 			mCamera.addCallbackBuffer(mYUVData);
@@ -491,6 +498,5 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.i(TAG, "surfaceDestroyed");
-        endCamera();
     }
 }

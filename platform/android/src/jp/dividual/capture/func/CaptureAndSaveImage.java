@@ -21,8 +21,8 @@ public class CaptureAndSaveImage implements FREFunction {
         	CaptureAndroidContext ctx = (CaptureAndroidContext)context;
         	CameraSurfaceView cameraSurface = ctx.getCameraSurface();
             if(cameraSurface != null && 1 < args.length) {
-                String dirName = args[1].getAsString();
-                int orientation = args[2].getAsInt();
+                String dirName = args[0].getAsString();
+                int orientation = args[1].getAsInt();
                 String path = cameraSurface.captureAndSaveImage(dirName, orientation);
                 ret = FREObject.newObject(path);
             }
