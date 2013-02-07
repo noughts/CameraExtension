@@ -219,18 +219,18 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     
     public void grabFrame(ByteBuffer bytes) {
     	// Rotate if front side
-    	//if (mFacing) {
-    	//	for (int j = 0; j < mFrameHeight; j++) {
-    	//		for (int i = 0; i < mFrameWidth; i++) {
-    	//			int sj = mFrameHeight - j;
-    	//			int si = mFrameWidth - i;
-    	//			int idx = (j * mFrameWidth + i) * 4;
-    	//			int srcIdx = (sj * mFrameWidth + si) * 4;
-    	//			System.arraycopy(mRGBAData, srcIdx, mRGBARotateData, idx, 4);
-    	//		}
-    	//	}
-    	//	bytes.put(mRGBARotateData, 0, mRGBADataSize);
-    	//}
+//    	if (mFacing) {
+//    		for (int j = 0; j < mFrameHeight; j++) {
+//    			for (int i = 0; i < mFrameWidth; i++) {
+//    				int sj = mFrameHeight - j - 1;
+//    				int si = mFrameWidth - i - 1;
+//    				int idx = (j * mFrameWidth + i) * 4;
+//    				int srcIdx = (sj * mFrameWidth + si) * 4;
+//					System.arraycopy(mRGBAData, srcIdx, mRGBARotateData, idx, 4);
+//    			}
+//    		}
+//    		bytes.put(mRGBARotateData, 0, mRGBADataSize);
+//    	}
 		bytes.put(mRGBAData, 0, mRGBADataSize);
     	mNewFrame = false;
     }
