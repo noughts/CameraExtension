@@ -19,6 +19,7 @@ public class CaptureAndroid implements FREExtension {
 
 	@Override
 	public void initialize() {
+		
 
 	}
 

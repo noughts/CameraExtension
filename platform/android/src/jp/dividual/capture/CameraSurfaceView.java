@@ -4,17 +4,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.lang.Integer;
-import java.nio.ByteBuffer;
-
-//import ru.inspirit.capture.CameraSurface;
-
-import com.adobe.fre.FREContext;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.media.AudioManager;
@@ -23,6 +19,8 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import com.adobe.fre.FREContext;
 
 public class CameraSurfaceView extends SurfaceView implements
 		SurfaceHolder.Callback {
@@ -329,19 +327,23 @@ public class CameraSurfaceView extends SurfaceView implements
 		
 		int[] mRGBADataIntArray = convertYUV420_NV21toRGB8888(data, mFrameWidth, mFrameHeight);
 				
+		//Initialize the bitmap, with the replaced color  
+		Bitmap bmp = Bitmap.createBitmap(mRGBADataIntArray, mFrameWidth, mFrameHeight, Bitmap.Config.ARGB_8888);  
+
+		
 		
 		
 		for(int i = 0; i < mRGBADataIntArray.length; i++){
-			Log.i(TAG, "rgb = " + mRGBADataIntArray[i]);
+			//Log.i(TAG, "rgb = " + mRGBADataIntArray[i]);
 			
-			/*
-			mRGBAData[i] = (byte)((mRGBADataIntArray[i] >> 24) & 0xff);
-			mRGBAData[i+1] = (byte)((mRGBADataIntArray[i] >> 16) & 0xff);
-			mRGBAData[i+2] = (byte)((mRGBADataIntArray[i] >> 8) & 0xff);
-			mRGBAData[i+3] = (byte)(mRGBADataIntArray[i] & 0xff);
-			*/
+			mRGBAData[i*4] = (byte)(mRGBADataIntArray[i] & 0xff);
+			mRGBAData[i*4+1] = (byte)((mRGBADataIntArray[i] >> 24) & 0xff);
+			mRGBAData[i*4+2] = (byte)((mRGBADataIntArray[i] >> 16) & 0xff);
+			mRGBAData[i*4+3] = (byte)((mRGBADataIntArray[i] >> 8) & 0xff);
 			
-			mRGBAData[i] = (byte)mRGBADataIntArray[i];
+			
+			
+			//mRGBAData[i] = (byte)mRGBADataIntArray[i];
 			
 		
 			
@@ -530,6 +532,24 @@ public class CameraSurfaceView extends SurfaceView implements
 				}
 			}
 			params.setPreviewSize(previewWidth, previewHeight);
+			
+			// picture format
+            List<Integer> pict_fmt = params.getSupportedPictureFormats();
+            {
+                for (Integer fmt : pict_fmt) {
+                    Log.i(TAG, "picture fmt: " + fmt);
+                }
+            }
+            /*
+            if(pict_fmt.contains(ImageFormat.JPEG))
+            {
+                params.setPictureFormat(ImageFormat.JPEG);
+                Log.i(TAG, "setPictureFormat: JPEG");
+            } 
+*/
+            params.setPreviewFormat(ImageFormat.NV21);
+            
+            
 			mCamera.setParameters(params);
 			mFrameWidth = previewWidth;
 			mFrameHeight = previewHeight;
