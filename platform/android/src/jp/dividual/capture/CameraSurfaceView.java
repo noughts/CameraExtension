@@ -161,91 +161,92 @@ public class CameraSurfaceView extends SurfaceView implements
 			mCamera.setPreviewCallbackWithBuffer(mPreviewHandler);
 			startPreview();
 		} catch (IOException e) {
-			Log.w(TAG, "Error on starting camera preview: " + e.getMessage());
-		}
-	}
+    		Log.w(TAG, "Error on starting camera preview: " + e.getMessage());
+    	}
+    }
+    
+    public void endCamera() {
+    	if (mCamera != null) {
+    		try {
+        		mCamera.setPreviewDisplay(null);
+    		} catch (IOException e) {
+        		Log.w(TAG, "Error on finishing camera preview: " + e.getMessage());
+    		} finally {
+		        stopPreview();
+		        mCamera.setPreviewCallback(null);
+		        mCamera.release();
+		        mCamera = null;
+    		}
+    	}
+        
+        mYUVData = null;
+        mRGBAData = null;
+        mRGBARotateData = null;
+        
+        // This call will cause an error on next startCamera()
+        //CameraSurface.nativeDisposeConvert();
+    }
+    
+    public void flipCamera() {
+    	int n = Camera.getNumberOfCameras();
+    	if (1 < n) {
+    		int id = (mCameraId + 1) % n;
+    		endCamera();
+    		startCamera(id, mFrameWidth, mFrameHeight, mFPS, mPictureQuality);
+    	}
+    }
+    
+    public int getFrameWidth() {
+        return mFrameWidth;
+    }
 
-	public void endCamera() {
-		if (mCamera != null) {
-			try {
-				mCamera.setPreviewDisplay(null);
-			} catch (IOException e) {
-				Log.w(TAG,
-						"Error on finishing camera preview: " + e.getMessage());
-			} finally {
-				stopPreview();
-				mCamera.setPreviewCallback(null);
-				mCamera.release();
-				mCamera = null;
-			}
-		}
+    public int getFrameHeight() {
+        return mFrameHeight;
+    }
 
-		mYUVData = null;
-		mRGBAData = null;
-		mRGBARotateData = null;
-
-		// This call will cause an error on next startCamera()
-		// CameraSurface.nativeDisposeConvert();
-	}
-
-	public void flipCamera() {
-		int n = Camera.getNumberOfCameras();
-		if (1 < n) {
-			int id = (mCameraId + 1) % n;
-			endCamera();
-			startCamera(id, mFrameWidth, mFrameHeight, mFPS, mPictureQuality);
-		}
-	}
-
-	public int getFrameWidth() {
-		return mFrameWidth;
-	}
-
-	public int getFrameHeight() {
-		return mFrameHeight;
-	}
-
-	public void startPreview() {
-		if (!isCapturing) {
-			mCamera.startPreview();
-			isCapturing = true;
-		}
-	}
-
-	public void stopPreview() {
-		if (isCapturing) {
-			mCamera.stopPreview();
-			isCapturing = false;
-		}
-	}
-
-	public void focusAtPoint(double x, double y) {
-		mCamera.autoFocus(new Camera.AutoFocusCallback() {
-			@Override
-			public void onAutoFocus(boolean success, Camera camera) {
-				mContext.dispatchStatusEventAsync(EVENT_FOCUS_COMPLETE, "0");
-			}
-		});
-	}
-
-	public boolean isNewFrame() {
-		return mNewFrame;
-	}
-
-	public void grabFrame(ByteBuffer bytes) {
-		// Rotate if front side
-		// if (mFacing) {
-		// for (int j = 0; j < mFrameHeight; j++) {
-		// for (int i = 0; i < mFrameWidth; i++) {
-		// int sj = mFrameHeight - j;
-		// int si = mFrameWidth - i;
-		// int idx = (j * mFrameWidth + i) * 4;
-		// int srcIdx = (sj * mFrameWidth + si) * 4;
-		// System.arraycopy(mRGBAData, srcIdx, mRGBARotateData, idx, 4);
-		// }
-		// }
-		// bytes.put(mRGBARotateData, 0, mRGBADataSize);
-		// }
+    public void startPreview() {
+        if (!isCapturing) {
+            mCamera.startPreview();
+            isCapturing = true;
+        }
+    }
+    
+    public void stopPreview() {
+        if (isCapturing)
+        {
+            mCamera.stopPreview();
+            isCapturing = false;
+        }
+    }
+    
+    public void focusAtPoint(double x, double y) {
+        mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                @Override
+                public void onAutoFocus(boolean success, Camera camera) {
+                	mContext.dispatchStatusEventAsync(EVENT_FOCUS_COMPLETE, "0");
+                }
+        });
+    }
+    
+    public boolean isNewFrame() {
+    	return mNewFrame;
+    }
+    
+    public void grabFrame(ByteBuffer bytes) {
+    	// Rotate if front side
+//    	if (mFacing) {
+//    		for (int j = 0; j < mFrameHeight; j++) {
+//    			for (int i = 0; i < mFrameWidth; i++) {
+//    				int sj = mFrameHeight - j - 1;
+//    				int si = mFrameWidth - i - 1;
+//    				int idx = (j * mFrameWidth + i) * 4;
+//    				int srcIdx = (sj * mFrameWidth + si) * 4;
+//					System.arraycopy(mRGBAData, srcIdx, mRGBARotateData, idx, 4);
+//    			}
+//    		}
+//    		bytes.put(mRGBARotateData, 0, mRGBADataSize);
+//    	}
+>>>>>>> feature/android_implement
 		bytes.put(mRGBAData, 0, mRGBADataSize);
 		mNewFrame = false;
 	}
