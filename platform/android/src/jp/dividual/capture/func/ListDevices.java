@@ -1,4 +1,4 @@
-package ru.inspirit.capture;
+package jp.dividual.capture.func;
 
 import android.util.Log;
 import android.hardware.Camera;
@@ -13,25 +13,24 @@ import com.adobe.fre.FREFunction;
 import com.adobe.fre.FREObject;
 import com.adobe.fre.FREByteArray;
 
-public class ListCaptureDevicesFunction implements FREFunction 
-{
-    private static final String TAG = "ListCaptureDevicesFunction";
+public class ListDevices implements FREFunction {
     
     public static final String KEY = "listDevices";
-    public static Charset charset = Charset.forName("UTF-8");
-    public static CharsetEncoder encoder = charset.newEncoder();
+
+    private static final String TAG = "ListCaptureDevicesFunction";
+    
+    private static Charset charset = Charset.forName("UTF-8");
+    private static CharsetEncoder encoder = charset.newEncoder();
     
     @Override
-    public FREObject call(FREContext context, FREObject[] args) 
-    {
-        FREByteArray _info;
+    public FREObject call(FREContext context, FREObject[] args) {
+        FREByteArray info;
         ByteBuffer bytes;
 
-        try
-        {
-            _info = (FREByteArray)args[1];
-            _info.acquire();
-            bytes = _info.getBytes();
+        try {
+            info = (FREByteArray)args[0];
+            info.acquire();
+            bytes = info.getBytes();
             bytes.order(ByteOrder.LITTLE_ENDIAN);
 
             ByteBuffer str0 = str_to_bb("Back Camera");
@@ -45,8 +44,7 @@ public class ListCaptureDevicesFunction implements FREFunction
             bytes.putInt(1);
             bytes.putInt(1);
 
-            if(num > 1)
-            {
+            if (num > 1) {
                 ByteBuffer str1 = str_to_bb("Front Camera");
 
                 bytes.putInt(12);
@@ -55,22 +53,20 @@ public class ListCaptureDevicesFunction implements FREFunction
                 bytes.putInt(1);
             }
 
-            _info.release();
-        } 
-        catch(Exception e)
-        {
+            info.release();
+        } catch (Exception e) {
             Log.i(TAG, "Error: " + e.toString());
         }
 
         return null;
     }
 
-    public static ByteBuffer str_to_bb(String msg)
-    {
-        try{
+    private static ByteBuffer str_to_bb(String msg) {
+        try {
             return encoder.encode(CharBuffer.wrap(msg));
-        }catch(Exception e){e.printStackTrace();}
-
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
         return null;
     }
 

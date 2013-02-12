@@ -1,5 +1,5 @@
-package ru.inspirit.capture
-{
+package jp.dividual.capture {
+
     /**
      * Just simple device info
      * u can trust only the name ;)

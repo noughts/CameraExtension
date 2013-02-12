@@ -1,5 +1,7 @@
-package ru.inspirit.capture;
+package jp.dividual.capture.func;
 
+import jp.dividual.capture.CameraSurfaceView;
+import jp.dividual.capture.CaptureAndroidContext;
 import android.hardware.Camera;
 import android.util.Log;
 
@@ -7,21 +9,23 @@ import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.adobe.fre.FREObject;
 
-public class SetFlashModeFunction implements FREFunction {
+public class SetFlashMode implements FREFunction {
+
+    public static final String KEY = "setFlashMode";
 
     private static final String TAG = "SetFlashModeFunction";
-    public static final String KEY = "setFlashMode";
     
 	@Override
 	public FREObject call(FREContext context, FREObject[] args) {
         try {
-            CameraSurface cap = CaptureAndroidContext.cameraSurfaceHandler;
-            if (cap != null) {
-            	if (args != null && 1 < args.length) {
-                    int code = args[1].getAsInt();
+        	CaptureAndroidContext ctx = (CaptureAndroidContext)context;
+        	CameraSurfaceView cameraSurface = ctx.getCameraSurface();
+            if (cameraSurface != null) {
+            	if (args != null && 1 == args.length) {
+                    int code = args[0].getAsInt();
                     String mode = convertFlashModeFromInt(code);
                     if (mode != null) {
-                    	cap.setFlashMode(mode);
+                    	cameraSurface.setFlashMode(mode);
                     }
             	}
             }
@@ -33,22 +37,16 @@ public class SetFlashModeFunction implements FREFunction {
 	}
 
 	private static String convertFlashModeFromInt(int code) {
-		String mode = null;
+		String mode = Camera.Parameters.FLASH_MODE_AUTO;
 		switch (code) {
-			case CameraSurface.ANDROID_FLASH_MODE_OFF:
+			case CameraSurfaceView.FLASH_MODE_OFF:
 				mode = Camera.Parameters.FLASH_MODE_OFF;
 				break;
-			case CameraSurface.ANDROID_FLASH_MODE_ON:
+			case CameraSurfaceView.FLASH_MODE_ON:
 				mode = Camera.Parameters.FLASH_MODE_ON;
 				break;
-			case CameraSurface.ANDROID_FLASH_MODE_AUTO:
+			case CameraSurfaceView.FLASH_MODE_AUTO:
 				mode = Camera.Parameters.FLASH_MODE_AUTO;
-				break;
-			case CameraSurface.ANDROID_FLASH_MODE_RED_EYE:
-				mode = Camera.Parameters.FLASH_MODE_RED_EYE;
-				break;
-			case CameraSurface.ANDROID_FLASH_MODE_TORCH:
-				mode = Camera.Parameters.FLASH_MODE_TORCH;
 				break;
 		}
 		return mode;

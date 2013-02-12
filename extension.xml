@@ -1,5 +1,5 @@
 <extension xmlns="http://ns.adobe.com/air/extension/3.1">
-  <id>ru.inspirit.capture</id>
+  <id>jp.dividual.capture</id>
   <versionNumber>1.0</versionNumber>
   <platforms>
   	<!--
@@ -36,8 +36,8 @@
     <platform name="Android-ARM">
       <applicationDeployment>
         <nativeLibrary>captureandroid.jar</nativeLibrary>
-        <initializer>ru.inspirit.capture.CaptureAndroid</initializer>
-        <finalizer>ru.inspirit.capture.CaptureAndroid</finalizer>
+        <initializer>jp.dividual.capture.func.CaptureAndroid</initializer>
+        <finalizer>jp.dividual.capture.func.CaptureAndroid</finalizer>
       </applicationDeployment>
     </platform>
     
