@@ -314,10 +314,10 @@ FREObject toggleCapturing(FREContext ctx, void* funcData, uint32_t argc, FREObje
 
 FREObject getCaptureFrame(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
-    int32_t id, width, height;
+    int32_t w, h, w2, h2, widthInBytes, i, j, id;
     FREGetObjectAsInt32(argv[1], &id);
-    FREGetObjectAsInt32(argv[2], &width);
-    FREGetObjectAsInt32(argv[3], &height);
+    FREGetObjectAsInt32(argv[2], &w2);
+    FREGetObjectAsInt32(argv[3], &h2);
     int32_t opt = FRAME_BITMAP;
     
     FREObject res_obj;
@@ -330,7 +330,6 @@ FREObject getCaptureFrame(FREContext ctx, void* funcData, uint32_t argc, FREObje
     const uint8_t* frame_0;
     const uint8_t* frame;
 
-    int32_t w, h, w2, h2, widthInBytes, i, j;
     uint32_t fstride;
     CCapture* cap;
     cap = active_cams[id];
@@ -342,7 +341,7 @@ FREObject getCaptureFrame(FREContext ctx, void* funcData, uint32_t argc, FREObje
     #endif
 
     if (cap && captureCheckNewFrame(cap)) {
-        frame_0 = (const uint8_t*)captureGetFrame(cap, &width, &height, &widthInBytes);
+        frame_0 = (const uint8_t*)captureGetFrame(cap, &w, &h, &widthInBytes);
 
         // here is some conversion we need cause in Flash BitmapData bytes
         // represented differently :(
