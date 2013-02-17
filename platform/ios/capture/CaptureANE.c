@@ -157,12 +157,9 @@ FREObject listDevices(FREContext ctx, void* funcData, uint32_t argc, FREObject a
     int32_t i, numDevices = 0;
     CaptureDeviceInfo devices[MAX_ACTIVE_CAMS * 2];
 
-    int32_t refresh = 0;
-    FREGetObjectAsInt32(argv[0], &refresh);
+    numDevices = getCaptureDevices(devices, 1);
 
-    numDevices = getCaptureDevices(devices, refresh);
-
-    FREObject objectBA = argv[1];
+    FREObject objectBA = argv[0];
     FREByteArray baData;
 
     FREAcquireByteArray(objectBA, &baData);
@@ -192,13 +189,13 @@ FREObject listDevices(FREContext ctx, void* funcData, uint32_t argc, FREObject a
 
 FREObject getCapture(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
+    int32_t camera_index = 0;
     int32_t w, h;
     int32_t frameRate = 0;
     uint32_t name_size = 0;
     const uint8_t* name_val = NULL;
 
-    FREGetObjectAsUTF8(argv[0], &name_size, &name_val);
-
+    FREGetObjectAsInt32(argv[0], &camera_index);
     FREGetObjectAsInt32(argv[1], &w);
     FREGetObjectAsInt32(argv[2], &h);
     FREGetObjectAsInt32(argv[3], &frameRate);
@@ -229,8 +226,13 @@ FREObject getCapture(FREContext ctx, void* funcData, uint32_t argc, FREObject ar
     }
 
     CCapture* cap = NULL;
-
-    cap = createCameraCapture(w, h, (char *)name_val, frameRate );
+    if (camera_index == 1) {
+        char camera_name[] = "Front Camera";
+        cap = createCameraCapture(w, h, camera_name, frameRate );
+    } else {
+        char camera_name[] = "Back Camera";
+        cap = createCameraCapture(w, h, camera_name, frameRate );
+    }
     
     if(!cap)
     {
@@ -251,7 +253,7 @@ FREObject getCapture(FREContext ctx, void* funcData, uint32_t argc, FREObject ar
     captureGetSize( cap, &w, &h );
 
     // write result
-    ba += ba_write_int(ba, emptySlot);
+    //ba += ba_write_int(ba, emptySlot);
     ba += ba_write_int(ba, w);
     ba += ba_write_int(ba, h);
 
@@ -312,9 +314,12 @@ FREObject toggleCapturing(FREContext ctx, void* funcData, uint32_t argc, FREObje
 
 FREObject getCaptureFrame(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
-    int32_t _id, _opt;
-    FREGetObjectAsInt32(argv[0], &_id);
-
+    int32_t id, width, height;
+    FREGetObjectAsInt32(argv[1], &id);
+    FREGetObjectAsInt32(argv[2], &width);
+    FREGetObjectAsInt32(argv[3], &height);
+    int32_t opt = FRAME_BITMAP;
+    
     FREObject res_obj;
     FRENewObjectFromInt32(0, &res_obj);
 
@@ -328,7 +333,7 @@ FREObject getCaptureFrame(FREContext ctx, void* funcData, uint32_t argc, FREObje
     int32_t w, h, w2, h2, widthInBytes, i, j;
     uint32_t fstride;
     CCapture* cap;
-    cap = active_cams[_id];
+    cap = active_cams[id];
     
     uint32_t flipped = 0;
     uint32_t isWin = 1;
@@ -336,25 +341,14 @@ FREObject getCaptureFrame(FREContext ctx, void* funcData, uint32_t argc, FREObje
         isWin = 0;
     #endif
 
-    objectBA = argv[1];
-    FREAcquireByteArray(objectBA, &baData);
-    ba = baData.bytes;
-
-    ba += ba_read_int(ba, &_opt);
-    ba += ba_read_int(ba, &w2);
-    ba += ba_read_int(ba, &h2);
-
-    FREReleaseByteArray(objectBA);
-
-    if(cap && captureCheckNewFrame(cap))
-    {
-        frame_0 = (const uint8_t*)captureGetFrame(cap, &w, &h, &widthInBytes);
+    if (cap && captureCheckNewFrame(cap)) {
+        frame_0 = (const uint8_t*)captureGetFrame(cap, &width, &height, &widthInBytes);
 
         // here is some conversion we need cause in Flash BitmapData bytes
         // represented differently :(
-        if((_opt & FRAME_BITMAP))
+        if((opt & FRAME_BITMAP))
         {
-            objectBA = argv[2];
+            objectBA = argv[0];
             FREAcquireBitmapData2(objectBA, &bitmapData);
 
             uint32_t* input = bitmapData.bits32;
@@ -447,7 +441,7 @@ FREObject getCaptureFrame(FREContext ctx, void* funcData, uint32_t argc, FREObje
             FREReleaseBitmapData(objectBA);
         } 
 
-        if((_opt & FRAME_RAW))
+        if((opt & FRAME_RAW))
         {
             objectBA = argv[3];
             FREAcquireByteArray(objectBA, &baData);
@@ -459,7 +453,7 @@ FREObject getCaptureFrame(FREContext ctx, void* funcData, uint32_t argc, FREObje
         }
 
         // power of 2 output for stage3d
-        if((_opt & FRAME_P2_BGRA))
+        if((opt & FRAME_P2_BGRA))
         {
             objectBA = argv[4];
             FREAcquireByteArray(objectBA, &baData);
@@ -633,10 +627,10 @@ FREObject focusAtPoint(FREContext ctx, void* funcData, uint32_t argc, FREObject 
 {
     int32_t _id;
     double _x, _y;
-    FREGetObjectAsInt32(argv[0], &_id);
+    FREGetObjectAsInt32(argv[2], &_id);
     
-    FREGetObjectAsDouble(argv[1], &_x);
-    FREGetObjectAsDouble(argv[2], &_y);
+    FREGetObjectAsDouble(argv[0], &_x);
+    FREGetObjectAsDouble(argv[1], &_y);
     
     CCapture* cap;
     cap = active_cams[_id];
@@ -648,16 +642,21 @@ FREObject focusAtPoint(FREContext ctx, void* funcData, uint32_t argc, FREObject 
     return NULL;
 }
 
+void focusCompleteCallback()
+{
+    FREDispatchStatusEventAsync(_ctx, (const uint8_t *)"FOCUS_COMPLETE", (const uint8_t *)"0");
+}
+
 // Additional APIs //
 
 FREObject exposureAtPoint(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
     int32_t id;
     double x, y;
-    FREGetObjectAsInt32(argv[0], &id);
+    FREGetObjectAsInt32(argv[2], &id);
     
-    FREGetObjectAsDouble(argv[1], &x);
-    FREGetObjectAsDouble(argv[2], &y);
+    FREGetObjectAsDouble(argv[0], &x);
+    FREGetObjectAsDouble(argv[1], &y);
     
     CCapture *cap;
     cap = active_cams[id];
@@ -673,8 +672,8 @@ FREObject setFlashMode(FREContext ctx, void* funcData, uint32_t argc, FREObject 
 {
     int32_t id;
     int32_t mode;
-    FREGetObjectAsInt32(argv[0], &id);
-    FREGetObjectAsInt32(argv[1], &mode);
+    FREGetObjectAsInt32(argv[1], &id);
+    FREGetObjectAsInt32(argv[0], &mode);
     
     CCapture *cap;
     cap = active_cams[id];
@@ -763,8 +762,9 @@ void previewReadyCallback()
 
 FREObject grabCamShot(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
-    if(_cam_shot_data)
-    {
+    FREObject ret = NULL;
+    
+    if (_cam_shot_data) {
         FREObject length = NULL;
         FRENewObjectFromUint32(_cam_shot_size, &length);
         FRESetObjectProperty(argv[0], (const uint8_t*) "length", length, NULL);
@@ -781,9 +781,13 @@ FREObject grabCamShot(FREContext ctx, void* funcData, uint32_t argc, FREObject a
         free(_cam_shot_data);
         _cam_shot_size = 0;
         _cam_shot_data = NULL;
+        
+        FRENewObjectFromUint32(1, &ret);
+    } else {
+        FRENewObjectFromUint32(0, &ret);
     }
     
-    return NULL;
+    return ret;
 }
 
 FREObject captureStillImage(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
@@ -816,8 +820,8 @@ void imageSavedCallback()
 FREObject captureAndSaveImage(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
     int32_t id, orientation;
-    FREGetObjectAsInt32(argv[0], &id);
-    FREGetObjectAsInt32(argv[2], &orientation);
+    FREGetObjectAsInt32(argv[2], &id);
+    FREGetObjectAsInt32(argv[1], &orientation);
 
     CCapture* cap;
     cap = active_cams[id];
@@ -835,69 +839,50 @@ void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, u
 {
     _ctx = ctx;
     
-    *numFunctions = 15;
+    *numFunctions = 10;
 
     FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * (*numFunctions));
 
-    func[0].name = (const uint8_t*) "listDevices";
+    func[0].name = (const uint8_t *)"startCamera";
     func[0].functionData = NULL;
-    func[0].function = &listDevices;
-
-    func[1].name = (const uint8_t*) "getCapture";
+    func[0].function = &getCapture;
+    
+    func[1].name = (const uint8_t *)"endCamera";
     func[1].functionData = NULL;
-    func[1].function = &getCapture;
+    func[1].function = &delCapture;
 
-    func[2].name = (const uint8_t*) "releaseCapture";
+    func[2].name = (const uint8_t *)"requestFrame";
     func[2].functionData = NULL;
-    func[2].function = &delCapture;
-
-    func[3].name = (const uint8_t*) "getCaptureFrame";
+    func[2].function = &getCaptureFrame;
+    
+    func[3].name = (const uint8_t*) "listDevices";
     func[3].functionData = NULL;
-    func[3].function = &getCaptureFrame;
+    func[3].function = &listDevices;
 
-    func[4].name = (const uint8_t*) "toggleCapturing";
+    func[4].name = (const uint8_t*) "flipCamera";
     func[4].functionData = NULL;
     func[4].function = &toggleCapturing;
-    
-    func[5].name = (const uint8_t*) "supportsSaveToCameraRoll";
+
+    func[5].name = (const uint8_t*) "focusAtPoint";
     func[5].functionData = NULL;
-    func[5].function = &supportsSaveToCameraRoll;
+    func[5].function = &focusAtPoint;
     
-    func[6].name = (const uint8_t*) "saveToCameraRoll";
+    func[6].name = (const uint8_t*) "exposureAtPoint";
     func[6].functionData = NULL;
-    func[6].function = &saveToCameraRoll;
+    func[6].function = &exposureAtPoint;
     
-    func[7].name = (const uint8_t*) "focusAtPoint";
+    func[7].name = (const uint8_t*) "setFlashMode";
     func[7].functionData = NULL;
-    func[7].function = &focusAtPoint;
+    func[7].function = &setFlashMode;
     
-    func[8].name = (const uint8_t*) "exposureAtPoint";
+    func[8].name = (const uint8_t*) "getFlashMode";
     func[8].functionData = NULL;
-    func[8].function = &exposureAtPoint;
-
-    func[9].name = (const uint8_t*) "setFlashMode";
-    func[9].functionData = NULL;
-    func[9].function = &setFlashMode;
-
-    func[10].name = (const uint8_t*) "getFlashMode";
-    func[10].functionData = NULL;
-    func[10].function = &getFlashMode;
-
-    func[11].name = (const uint8_t*) "camShot";
-    func[11].functionData = NULL;
-    func[11].function = &captureStillImage;
+    func[8].function = &getFlashMode;
     
-    func[12].name = (const uint8_t*) "grabCamShot";
-    func[12].functionData = NULL;
-    func[12].function = &grabCamShot;
-
-    func[13].name = (const uint8_t*) "disposeANE";
-    func[13].functionData = NULL;
-    func[13].function = &disposeANE;
-
-    func[14].name = (const uint8_t*) "captureAndSaveImage";
-    func[14].functionData = NULL;
-    func[14].function = &captureAndSaveImage;
+    func[9].name = (const uint8_t*) "captureAndSaveImage";
+    func[9].functionData = NULL;
+    func[9].function = &captureAndSaveImage;
+    
     *functions = func;
 
     memset(active_cams, 0, sizeof(CCapture*) * MAX_ACTIVE_CAMS);

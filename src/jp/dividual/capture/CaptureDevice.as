@@ -6,7 +6,7 @@ package jp.dividual.capture {
 	import flash.external.ExtensionContext;
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
-
+	
 	public final class CaptureDevice extends EventDispatcher{
 		internal static var _context:ExtensionContext;
 
@@ -98,17 +98,17 @@ package jp.dividual.capture {
 
 		// フォーカスと露出を調整します
 		public function focusAndExposureAtPoint(x:Number = 0.5, y:Number = 0.5):void {
-			_context.call('focusAtPoint', x, y);
+			_context.call('focusAtPoint', x, y, _index);
 		}
 
 		
 		// フラッシュの状態を設定
 		public function setFlashMode( flashMode:uint ):void{
-			_context.call( 'setFlashMode', flashMode );
+			_context.call( 'setFlashMode', flashMode, _index);
 		}
 		
 		public function getFlashMode():uint{
-			var flashMode:uint = _context.call('getFlashMode') as uint;
+			var flashMode:uint = _context.call('getFlashMode', _index) as uint;
 			return flashMode;
 		}
 		
@@ -116,7 +116,7 @@ package jp.dividual.capture {
 		// 更新されていたら true を返し、bmp プロパティを書き換える
 		public function requestFrame():Boolean {
 			if (_context != null) {
-				var isNewFrame:int = _context.call('requestFrame', bmp) as int;
+				var isNewFrame:int = _context.call('requestFrame', bmp, _index, _width, _height) as int;
 				return (isNewFrame == 1);
 			} else {
 				return false;
@@ -127,7 +127,7 @@ package jp.dividual.capture {
 		// フォーカスと露出を合わせて撮影、フルサイズの画像を端末のカメラロールに保存し、withSound が true ならシャッター音を鳴らす
 		// シャッター音は消せない可能性あり。要相談
 		public function shutter(directoryName:String, pictureOrientation:int, withSound:Boolean=true):void {
-			_context.call('captureAndSaveImage', directoryName, pictureOrientation);
+			_context.call('captureAndSaveImage', directoryName, pictureOrientation, _index);
 		}
 		
 		// カメラを順番に切り替える

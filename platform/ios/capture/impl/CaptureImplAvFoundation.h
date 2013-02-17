@@ -30,6 +30,7 @@ typedef void (Capture::*imageCallback)(const uint8_t *data, int32_t size);
 extern void statusBarTappedCallback();
 extern void previewReadyCallback();
 extern void imageSavedCallback();
+extern void focusCompleteCallback();
 
 class CaptureImplAvFoundationDevice : public Capture::Device {
  public:
