@@ -312,6 +312,19 @@ FREObject toggleCapturing(FREContext ctx, void* funcData, uint32_t argc, FREObje
     return NULL;
 }
 
+FREObject stopCapturing(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+    int32_t id;
+    FREGetObjectAsInt32(argv[0], &id);
+    
+    CCapture* cap;
+    cap = active_cams[id];
+    
+    if(cap) {
+        captureStop(cap);
+    }
+    return NULL;
+}
+
 FREObject getCaptureFrame(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
     int32_t w, h, w2, h2, widthInBytes, i, j, id;
@@ -622,7 +635,7 @@ FREObject saveToCameraRoll(FREContext ctx, void* funcData, uint32_t argc, FREObj
     return res_obj;
 }
 
-FREObject focusAtPoint(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+FREObject focusAndExposureAtPoint(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
     int32_t _id;
     double _x, _y;
@@ -637,6 +650,7 @@ FREObject focusAtPoint(FREContext ctx, void* funcData, uint32_t argc, FREObject 
     if(cap)
     {
         captureFocusAtPoint(cap, (float)_x, (float)_y);
+        captureExposureAtPoint(cap, (float)_x, (float)_y);
     }
     return NULL;
 }
@@ -648,22 +662,23 @@ void focusCompleteCallback()
 
 // Additional APIs //
 
-FREObject exposureAtPoint(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+FREObject flipCamera(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
     int32_t id;
-    double x, y;
-    FREGetObjectAsInt32(argv[2], &id);
+    FREGetObjectAsInt32(argv[0], &id);
     
-    FREGetObjectAsDouble(argv[0], &x);
-    FREGetObjectAsDouble(argv[1], &y);
-    
-    CCapture *cap;
+    CCapture* cap;
     cap = active_cams[id];
-    
-    if(cap)
-    {
-        captureExposureAtPoint(cap, (float)x, (float)y);
+    if (cap) {
+        captureStop(cap);
     }
+    
+    int next_id = (id + 1) % active_cams_count;
+    cap = active_cams[next_id];
+    if(cap) {
+        captureStart(cap);
+    }
+    
     return NULL;
 }
 
@@ -838,7 +853,7 @@ void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, u
 {
     _ctx = ctx;
     
-    *numFunctions = 10;
+    *numFunctions = 9;
 
     FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * (*numFunctions));
 
@@ -848,7 +863,7 @@ void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, u
     
     func[1].name = (const uint8_t *)"endCamera";
     func[1].functionData = NULL;
-    func[1].function = &delCapture;
+    func[1].function = &stopCapturing;
 
     func[2].name = (const uint8_t *)"requestFrame";
     func[2].functionData = NULL;
@@ -860,27 +875,23 @@ void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, u
 
     func[4].name = (const uint8_t*) "flipCamera";
     func[4].functionData = NULL;
-    func[4].function = &toggleCapturing;
+    func[4].function = &flipCamera;
 
     func[5].name = (const uint8_t*) "focusAtPoint";
     func[5].functionData = NULL;
-    func[5].function = &focusAtPoint;
-    
-    func[6].name = (const uint8_t*) "exposureAtPoint";
+    func[5].function = &focusAndExposureAtPoint;
+        
+    func[6].name = (const uint8_t*) "setFlashMode";
     func[6].functionData = NULL;
-    func[6].function = &exposureAtPoint;
+    func[6].function = &setFlashMode;
     
-    func[7].name = (const uint8_t*) "setFlashMode";
+    func[7].name = (const uint8_t*) "getFlashMode";
     func[7].functionData = NULL;
-    func[7].function = &setFlashMode;
+    func[7].function = &getFlashMode;
     
-    func[8].name = (const uint8_t*) "getFlashMode";
+    func[8].name = (const uint8_t*) "captureAndSaveImage";
     func[8].functionData = NULL;
-    func[8].function = &getFlashMode;
-    
-    func[9].name = (const uint8_t*) "captureAndSaveImage";
-    func[9].functionData = NULL;
-    func[9].function = &captureAndSaveImage;
+    func[8].function = &captureAndSaveImage;
     
     *functions = func;
 

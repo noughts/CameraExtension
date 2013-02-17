@@ -91,7 +91,7 @@ package jp.dividual.capture {
 		 * Stop capturing video
 		 */
 		public function stopCapturing():void{
-			_context.call('endCamera' );
+			_context.call('endCamera', _index);
 			_context.removeEventListener(StatusEvent.STATUS, onMiscStatus);
 		}
 
