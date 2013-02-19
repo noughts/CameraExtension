@@ -24,7 +24,7 @@ import com.adobe.fre.FREObject;
 
 public class GetLocationFunction implements FREFunction {
 
-	public static final String KEY = "registerPush"; // ToDo:getLocationにかえる。
+	public static final String KEY = "getLocation"; // ToDo:getLocationにかえる。
 
 	private static final String TAG = "GetLocationFunction";
 

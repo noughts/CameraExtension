@@ -118,8 +118,9 @@ public class CaptureAndroidContext extends FREContext {
 		
 		//map.put(RegisterPushFunction.KEY, new RegisterPushFunction());
 		map.put(GetLocationFunction.KEY, new GetLocationFunction());
-		//map.put(PutExifLocation.KEY, new PutExifLocation());
-				
+		map.put(PutExifLocation.KEY, new PutExifLocation());
+		
+		
 		return map;
 	}
 
