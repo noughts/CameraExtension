@@ -3,7 +3,9 @@ package jp.dividual.capture.func;
 
 import jp.dividual.capture.IntentReceiver;
 import jp.dividual.capture.Resources;
+import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
 import com.adobe.fre.FREContext;
@@ -26,20 +28,13 @@ public class RegisterPushFunction implements FREFunction {
 
 	@Override
 	public FREObject call(FREContext context, FREObject[] args) {
+		Log.i(TAG, "registerPush called");
+		
 		FREObject ret = null;
 		try {
 			
-			Application app = context.getActivity().getApplication();
-			
-			AirshipConfigOptions options = AirshipConfigOptions.loadDefaultOptions(app);
-
-	        // Optionally, customize your config at runtime:
-	        //
-	        // options.inProduction = false;
-	        // options.developmentAppKey = "Your Development App Key";
-	        // options.developmentAppSecret "Your Development App Secret";
-
-	        UAirship.takeOff(app, options);
+		
+	        
 	        Logger.logLevel = Log.VERBOSE;
 
 	        //use CustomPushNotificationBuilder to specify a custom layout
@@ -68,8 +63,11 @@ public class RegisterPushFunction implements FREFunction {
 			PushPreferences pushPrefs = PushManager.shared().getPreferences();
 			pushPrefs.setSoundEnabled(soundEnabled);
 			pushPrefs.setVibrateEnabled(vibEnabled);
+			
+			
+			Log.i(TAG, "Push Registered");
 		} catch (Exception e) {
-			Log.i(TAG, "Error: " + e.toString());
+			Log.i(TAG, "registerPush Error: " + e.toString());
 		}
 		return ret;
 	}

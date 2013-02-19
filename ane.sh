@@ -11,6 +11,8 @@ cp ${LIB_PATH}/${LIB_FILE} ./platform/ios/
 echo "Extracting .swf file..."
 unzip -o ./bin/${SWC_FILE} library.swf -d ./platform/ios/
 unzip -o ./bin/${SWC_FILE} library.swf -d ./platform/android/
+echo "Embedding class files to jar..."
+jar -uf ./platform/android/bin/${JAR_FILE} -C ./platform/android/classes com
 cp ./platform/android/bin/${JAR_FILE} ./platform/android/
 echo "Packaging ANE file..."
 "${ADT}" \
@@ -22,3 +24,7 @@ echo "Packaging ANE file..."
 -platform Android-ARM \
 -C ./platform/android . 
 echo "Done."
+
+echo "Copying ANE file to Sample App..."
+cp -R ./${ANE_FILE} ../SampleApp/
+echo "Done!"

@@ -125,6 +125,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             setupPreviewSize(width, height);
             setupPictureSize(pictureQuality);
             setupFPS(fps);
+            setExposure(4);
  
             Camera.CameraInfo info = new Camera.CameraInfo();
             Camera.getCameraInfo(cameraIndex, info);
@@ -279,7 +280,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
                             } catch (IOException e) {
                                 Log.d(TAG, "Error accessing file: " + e.getMessage());
                             }
-                            mContext.dispatchStatusEventAsync(EVENT_IMAGE_SAVED, "0");
+                            mContext.dispatchStatusEventAsync(EVENT_IMAGE_SAVED, pictureFile.getAbsolutePath());
                             // resume camera
                             mCamera.startPreview();
                         }
@@ -453,6 +454,35 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             }
             params.setPreviewFpsRange(minFPS, maxFPS);
             Log.i(TAG, "setPreviewFpsRange: " + minFPS + "/" + maxFPS);
+        }
+    }
+    
+    private void setExposure(int exposureCompensation) {
+        if (mCamera != null) {
+            Camera.Parameters params = mCamera.getParameters();
+            
+            int min = params.getMinExposureCompensation();
+    		int max = params.getMaxExposureCompensation();
+    		int current = params.getExposureCompensation();
+    		Log.d(TAG, "MinExposureCompensation = " + min);
+    		Log.d(TAG, "MaxExposureCompensation = " + max);
+    		Log.d(TAG, "CurrentExposureCompensation = " + current);
+    		Log.d(TAG, "ExposureCompensationStep = " + params.getExposureCompensationStep());
+    		
+    				
+    		
+    		if (exposureCompensation > max) {
+    			current = max;
+    		} else if (exposureCompensation < min) {
+    			current = min;
+    		}else{
+    			current = exposureCompensation;
+    		}
+    				
+    		params.setExposureCompensation(current);		
+    		mCamera.setParameters(params);
+            
+            
         }
     }
      
