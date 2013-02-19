@@ -126,9 +126,16 @@ package jp.dividual.capture {
 
 		// フォーカスと露出を合わせて撮影、フルサイズの画像を端末のカメラロールに保存し、withSound が true ならシャッター音を鳴らす
 		// シャッター音は消せない可能性あり。要相談
-		public function shutter(directoryName:String, pictureOrientation:int, withSound:Boolean=true):void {
+		public function shutter( directoryName:String, pictureOrientation:int, withSound:Boolean=true ):void {
 			_context.call('captureAndSaveImage', directoryName, pictureOrientation);
 		}
+
+
+		// android で撮影した画像に位置情報を入れる
+		public function putExifLocation( filePath:String, lat:Number, lng:Number ):void{
+			_context.call('putExifLocation', filePath, lat, lng );
+		}
+
 		
 		// カメラを順番に切り替える
 		public function toggleDevice():void{
@@ -160,7 +167,7 @@ package jp.dividual.capture {
 			} else if (e.code == EVENT_PREVIEW_READY) {
 				dispatchEvent(new Event(EVENT_PREVIEW_READY));
 			} else if (e.code == EVENT_IMAGE_SAVED) {
-				dispatchEvent(new Event(EVENT_IMAGE_SAVED));
+				dispatchEvent( e );
 			}
 		}
 
