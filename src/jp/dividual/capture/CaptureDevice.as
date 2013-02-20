@@ -9,7 +9,8 @@ package jp.dividual.capture {
 	
 	public final class CaptureDevice extends EventDispatcher{
 		internal static var _context:ExtensionContext;
-
+		internal static var _infoBuffer:ByteArray;
+		
 		// Flash mode
 		public static const FLASH_MODE_OFF:int = 0;
 		public static const FLASH_MODE_ON:int = 1;
@@ -41,6 +42,11 @@ package jp.dividual.capture {
 		public function CaptureDevice(cameraIndex:int, width:int, height:int, fps:int=15) {
 			if (!_context) {
 				_context = ExtensionContext.createExtensionContext("jp.dividual.capture", null);
+				if (!_infoBuffer) {
+					_infoBuffer = new ByteArray();
+					_infoBuffer.endian = Endian.LITTLE_ENDIAN;
+					_infoBuffer.length = 64 * 1024;
+				}
 			}
 
 			_index = cameraIndex;
@@ -55,16 +61,21 @@ package jp.dividual.capture {
 				_context = ExtensionContext.createExtensionContext("jp.dividual.capture", null);
 			}
 
-			var infoBuffer:ByteArray = new ByteArray();
-			infoBuffer.endian = Endian.LITTLE_ENDIAN;
-			infoBuffer.length = 64 * 1024;
-			_context.call('listDevices', infoBuffer);
+			if (!_infoBuffer) {
+				_infoBuffer = new ByteArray();
+				_infoBuffer.endian = Endian.LITTLE_ENDIAN;
+				_infoBuffer.length = 64 * 1024;
+			}
 			
-			var n:int = infoBuffer.readInt();
+			_context.call('listDevices', _infoBuffer);
+			
+			var n:int = _infoBuffer.readInt();
 			var ret:Array = new Array(n);
 			for (var i:int = 0; i < n; i++) {
-				var nameLength:int = infoBuffer.readInt();
-				var name:String = infoBuffer.readUTFBytes(nameLength);
+				var nameLength:int = _infoBuffer.readInt();
+				var name:String = _infoBuffer.readUTFBytes(nameLength);
+				var available:Boolean = Boolean(_infoBuffer.readInt());
+				var connected:Boolean = Boolean(_infoBuffer.readInt());
 				ret[i] = name;
 			}
 			return ret;
@@ -98,17 +109,17 @@ package jp.dividual.capture {
 
 		// フォーカスと露出を調整します
 		public function focusAndExposureAtPoint(x:Number = 0.5, y:Number = 0.5):void {
-			_context.call('focusAtPoint', x, y, _index);
+			_context.call('focusAtPoint', x, y);
 		}
 
 		
 		// フラッシュの状態を設定
 		public function setFlashMode( flashMode:uint ):void{
-			_context.call( 'setFlashMode', flashMode, _index);
+			_context.call( 'setFlashMode', flashMode);
 		}
 		
 		public function getFlashMode():uint{
-			var flashMode:uint = _context.call('getFlashMode', _index) as uint;
+			var flashMode:uint = _context.call('getFlashMode') as uint;
 			return flashMode;
 		}
 		
@@ -136,7 +147,9 @@ package jp.dividual.capture {
 			infoBuffer.endian = Endian.LITTLE_ENDIAN;
 			infoBuffer.length = 64 * 1024;
 			
+			//_context.call('startCamera', _index, _width, _height, _fps, infoBuffer, ANDROID_STILL_IMAGE_QUALITY_BEST);
 			_context.call('flipCamera', infoBuffer);
+			_index = (_index + 1) % 2;
 			
 			var width:int = infoBuffer.readInt();
 			var height:int = infoBuffer.readInt();

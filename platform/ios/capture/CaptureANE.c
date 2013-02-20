@@ -156,36 +156,39 @@ FREObject listDevices(FREContext ctx, void* funcData, uint32_t argc, FREObject a
 
     int32_t i, numDevices = 0;
     CaptureDeviceInfo devices[MAX_ACTIVE_CAMS * 2];
-
+    
     numDevices = getCaptureDevices(devices, 1);
-
+    
     FREObject objectBA = argv[0];
     FREByteArray baData;
-
+    
     FREAcquireByteArray(objectBA, &baData);
-
+    
     uint8_t *ba = baData.bytes;
-
+    
     ba += ba_write_int(ba, numDevices);
-
+    
     for (i = 0; i < numDevices; i++)
     {
         const CaptureDeviceInfo *dev = &devices[i];
-
+        
         ba += ba_write_int(ba, dev->name_size);
-        memcpy( ba, (uint8_t*)dev->name, dev->name_size ); 
+        memcpy( ba, (uint8_t*)dev->name, dev->name_size );
         ba += dev->name_size;
-
+        
         ba += ba_write_int(ba, dev->available);
         ba += ba_write_int(ba, dev->connected);
-
-        //printf("device (%d): %s  \n", i, dev->name);
     }
-
+    
     FREReleaseByteArray(objectBA);
-
     return NULL;
 }
+
+int32_t active_cam_width = 0;
+int32_t active_cam_height = 0;
+int32_t active_cam_fps = 0;
+int32_t active_cam_id = -1;
+bool active_cam_front = false;
 
 FREObject getCapture(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
@@ -205,33 +208,31 @@ FREObject getCapture(FREContext ctx, void* funcData, uint32_t argc, FREObject ar
     FREAcquireByteArray(objectBA, &baData);
     uint8_t *ba = baData.bytes;
 
-
     int32_t emptySlot = -1;
     size_t i;
     // search empty slot
-    for(i = 0; i < MAX_ACTIVE_CAMS; i++)
-    {
-        if(!active_cams[i])
-        {
+    for(i = 0; i < MAX_ACTIVE_CAMS; i++) {
+        if(!active_cams[i]) {
             emptySlot = i;
             break;
         }
     }
 
-    if(emptySlot == -1)
-    {
+    if (emptySlot == -1) {
         ba += ba_write_int(ba, -1);
         FREReleaseByteArray(objectBA);
         return NULL;
     }
-
+    
     CCapture* cap = NULL;
     if (camera_index == 1) {
         char camera_name[] = "Front Camera";
         cap = createCameraCapture(w, h, camera_name, frameRate );
+        active_cam_front = true;
     } else {
         char camera_name[] = "Back Camera";
         cap = createCameraCapture(w, h, camera_name, frameRate );
+        active_cam_front = false;
     }
     
     if(!cap)
@@ -248,10 +249,14 @@ FREObject getCapture(FREContext ctx, void* funcData, uint32_t argc, FREObject ar
     }
 
     active_cams[emptySlot] = cap;
+    active_cam_id = emptySlot;
     active_cams_count++;
 
     captureGetSize( cap, &w, &h );
-
+    active_cam_width = w;
+    active_cam_height = h;
+    active_cam_fps = frameRate;
+    
     // write result
     //ba += ba_write_int(ba, emptySlot);
     ba += ba_write_int(ba, w);
@@ -259,7 +264,10 @@ FREObject getCapture(FREContext ctx, void* funcData, uint32_t argc, FREObject ar
 
     FREReleaseByteArray(objectBA);
 
-    return NULL;
+    FREObject ret;
+    FRENewObjectFromInt32(emptySlot, &ret);
+    
+    return ret;
 }
 
 FREObject delCapture(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
@@ -313,15 +321,20 @@ FREObject toggleCapturing(FREContext ctx, void* funcData, uint32_t argc, FREObje
 }
 
 FREObject stopCapturing(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
-    int32_t id;
-    FREGetObjectAsInt32(argv[0], &id);
     
-    CCapture* cap;
-    cap = active_cams[id];
+    CCapture *cap = NULL;
+    if (0 <= active_cam_id && active_cam_id < MAX_ACTIVE_CAMS) {
+        cap = active_cams[active_cam_id];
+    }
     
     if(cap) {
-        captureStop(cap);
+        //captureStop(cap);
+        //releaseCapture(cap);
+        
+        //active_cams[active_cam_id] = 0;
+        //active_cams_count--;
     }
+    
     return NULL;
 }
 
@@ -344,8 +357,11 @@ FREObject getCaptureFrame(FREContext ctx, void* funcData, uint32_t argc, FREObje
     const uint8_t* frame;
 
     uint32_t fstride;
-    CCapture* cap;
-    cap = active_cams[id];
+    
+    CCapture *cap = NULL;
+    if (0 <= active_cam_id && active_cam_id < MAX_ACTIVE_CAMS) {
+        cap = active_cams[active_cam_id];
+    }
     
     uint32_t flipped = 0;
     uint32_t isWin = 1;
@@ -637,15 +653,15 @@ FREObject saveToCameraRoll(FREContext ctx, void* funcData, uint32_t argc, FREObj
 
 FREObject focusAndExposureAtPoint(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
-    int32_t _id;
     double _x, _y;
-    FREGetObjectAsInt32(argv[2], &_id);
     
     FREGetObjectAsDouble(argv[0], &_x);
     FREGetObjectAsDouble(argv[1], &_y);
     
-    CCapture* cap;
-    cap = active_cams[_id];
+    CCapture *cap = NULL;
+    if (0 <= active_cam_id && active_cam_id < MAX_ACTIVE_CAMS) {
+        cap = active_cams[active_cam_id];
+    }
     
     if(cap)
     {
@@ -664,33 +680,73 @@ void focusCompleteCallback()
 
 FREObject flipCamera(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
-    int32_t id;
-    FREGetObjectAsInt32(argv[0], &id);
+    FREObject objectBA = argv[0];
+    FREByteArray baData;
+    FREAcquireByteArray(objectBA, &baData);
+    uint8_t *ba = baData.bytes;
     
-    CCapture* cap;
-    cap = active_cams[id];
-    if (cap) {
-        captureStop(cap);
+    int32_t emptySlot = -1;
+    size_t i;
+    // search empty slot
+    for(i = 0; i < MAX_ACTIVE_CAMS; i++) {
+        if(!active_cams[i]) {
+            emptySlot = i;
+            break;
+        }
     }
     
-    int next_id = (id + 1) % active_cams_count;
-    cap = active_cams[next_id];
-    if(cap) {
+    if (emptySlot == -1) {
+        ba += ba_write_int(ba, -1);
+        FREReleaseByteArray(objectBA);
+        return NULL;
+    }
+    
+    CCapture* cap = NULL;
+    if (active_cam_front) {
+        char camera_name[] = "Back Camera";
+        cap = createCameraCapture(active_cam_width, active_cam_height, camera_name, active_cam_fps);
+        active_cam_front = false;
+    } else {
+        char camera_name[] = "Front Camera";
+        cap = createCameraCapture(active_cam_width, active_cam_height, camera_name, active_cam_fps);
+        active_cam_front = true;
+    }
+    
+    if(!cap) {
+        ba += ba_write_int(ba, -1);
+        FREReleaseByteArray(objectBA);
+        return NULL;
+    }
+    
+    // start if not running
+    if( captureIsCapturing(cap) == 0 ) {
         captureStart(cap);
     }
     
+    active_cams[emptySlot] = cap;
+    active_cam_id = emptySlot;
+    active_cams_count++;
+    
+    captureGetSize(cap, &active_cam_width, &active_cam_height);
+    
+    // write result
+    //ba += ba_write_int(ba, emptySlot);
+    ba += ba_write_int(ba, active_cam_width);
+    ba += ba_write_int(ba, active_cam_height);
+    
+    FREReleaseByteArray(objectBA);
     return NULL;
 }
 
 FREObject setFlashMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
-    int32_t id;
     int32_t mode;
-    FREGetObjectAsInt32(argv[1], &id);
     FREGetObjectAsInt32(argv[0], &mode);
     
-    CCapture *cap;
-    cap = active_cams[id];
+    CCapture *cap = NULL;
+    if (0 <= active_cam_id && active_cam_id < MAX_ACTIVE_CAMS) {
+        cap = active_cams[active_cam_id];
+    }
     
     if (cap)
     {
@@ -701,11 +757,10 @@ FREObject setFlashMode(FREContext ctx, void* funcData, uint32_t argc, FREObject 
 
 FREObject getFlashMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
-    int32_t id;
-    FREGetObjectAsInt32(argv[0], &id);
-    
-    CCapture *cap;
-    cap = active_cams[id];
+    CCapture *cap = NULL;
+    if (0 <= active_cam_id && active_cam_id < MAX_ACTIVE_CAMS) {
+        cap = active_cams[active_cam_id];
+    }
     
     if (cap)
     {
@@ -719,11 +774,10 @@ FREObject getFlashMode(FREContext ctx, void* funcData, uint32_t argc, FREObject 
 
 FREObject isAdjustingFocus(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
-    int32_t id;
-    FREGetObjectAsInt32(argv[0], &id);
-    
-    CCapture *cap;
-    cap = active_cams[id];
+    CCapture *cap = NULL;
+    if (0 <= active_cam_id && active_cam_id < MAX_ACTIVE_CAMS) {
+        cap = active_cams[active_cam_id];
+    }
     
     if (cap)
     {
@@ -737,11 +791,10 @@ FREObject isAdjustingFocus(FREContext ctx, void* funcData, uint32_t argc, FREObj
 
 FREObject isAdjustingExposure(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
-    int32_t id;
-    FREGetObjectAsInt32(argv[0], &id);
-    
-    CCapture *cap;
-    cap = active_cams[id];
+    CCapture *cap = NULL;
+    if (0 <= active_cam_id && active_cam_id < MAX_ACTIVE_CAMS) {
+        cap = active_cams[active_cam_id];
+    }
     
     if (cap)
     {
@@ -834,11 +887,12 @@ void imageSavedCallback()
 FREObject captureAndSaveImage(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
     int32_t id, orientation;
-    FREGetObjectAsInt32(argv[2], &id);
     FREGetObjectAsInt32(argv[1], &orientation);
 
-    CCapture* cap;
-    cap = active_cams[id];
+    CCapture *cap = NULL;
+    if (0 <= active_cam_id && active_cam_id < MAX_ACTIVE_CAMS) {
+        cap = active_cams[active_cam_id];
+    }
     
     if(cap) {
         captureAndSave(cap, orientation);
