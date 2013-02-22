@@ -25,13 +25,7 @@ package jp.dividual.capture {
 		public static const ROTATION_90:int = 1;
 		public static const ROTATION_180:int = 2;
 		public static const ROTATION_270:int = 3;
-		
-		// events
-		public static const EVENT_IMAGE_SAVED:String = 'IMAGE_SAVED';
-		public static const EVENT_CAPTURE_DEVICE_LOST:String = 'CAPTURE_DEVICE_LOST';
-		public static const EVENT_FOCUS_COMPLETE:String = 'FOCUS_COMPLETE';
-		public static const EVENT_PREVIEW_READY:String = 'PREVIEW_READY';
-		
+				
 		public var bmp:BitmapData;
 
 		private var _index:int;
@@ -140,6 +134,13 @@ package jp.dividual.capture {
 		public function shutter(directoryName:String, pictureOrientation:int, withSound:Boolean=true):void {
 			_context.call('captureAndSaveImage', directoryName, pictureOrientation, _index);
 		}
+
+
+		// android で撮影した画像に位置情報を入れる
+		public function putExifLocation( filePath:String, lat:Number, lng:Number ):void{
+			_context.call('putExifLocation', filePath, lat, lng );
+		}
+
 		
 		// カメラを順番に切り替える
 		public function toggleDevice():void{
@@ -168,12 +169,15 @@ package jp.dividual.capture {
 		
 		
 		internal function onMiscStatus(e:StatusEvent):void {
-			if (e.code == EVENT_FOCUS_COMPLETE) {
-				dispatchEvent(new Event(EVENT_FOCUS_COMPLETE));
-			} else if (e.code == EVENT_PREVIEW_READY) {
-				dispatchEvent(new Event(EVENT_PREVIEW_READY));
-			} else if (e.code == EVENT_IMAGE_SAVED) {
-				dispatchEvent(new Event(EVENT_IMAGE_SAVED));
+			trace( "onMiscStatus", e.code, e.level )
+			if (e.code == CaptureDeviceEvent.EVENT_FOCUS_COMPLETE) {
+				dispatchEvent(new Event(CaptureDeviceEvent.EVENT_FOCUS_COMPLETE));
+			} else if (e.code == CaptureDeviceEvent.EVENT_PREVIEW_READY) {
+				dispatchEvent(new Event(CaptureDeviceEvent.EVENT_PREVIEW_READY));
+			} else if (e.code == CaptureDeviceEvent.EVENT_IMAGE_SAVED) {
+				var ne:CaptureDeviceEvent = new CaptureDeviceEvent( CaptureDeviceEvent.EVENT_IMAGE_SAVED )
+				ne.data = e.level;
+				dispatchEvent( ne );
 			}
 		}
 
