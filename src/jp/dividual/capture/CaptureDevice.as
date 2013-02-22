@@ -171,9 +171,9 @@ package jp.dividual.capture {
 		internal function onMiscStatus(e:StatusEvent):void {
 			trace( "onMiscStatus", e.code, e.level )
 			if (e.code == CaptureDeviceEvent.EVENT_FOCUS_COMPLETE) {
-				dispatchEvent(new Event(CaptureDeviceEvent.EVENT_FOCUS_COMPLETE));
+				dispatchEvent(new CaptureDeviceEvent(CaptureDeviceEvent.EVENT_FOCUS_COMPLETE));
 			} else if (e.code == CaptureDeviceEvent.EVENT_PREVIEW_READY) {
-				dispatchEvent(new Event(CaptureDeviceEvent.EVENT_PREVIEW_READY));
+				dispatchEvent(new CaptureDeviceEvent(CaptureDeviceEvent.EVENT_PREVIEW_READY));
 			} else if (e.code == CaptureDeviceEvent.EVENT_IMAGE_SAVED) {
 				var ne:CaptureDeviceEvent = new CaptureDeviceEvent( CaptureDeviceEvent.EVENT_IMAGE_SAVED )
 				ne.data = e.level;
