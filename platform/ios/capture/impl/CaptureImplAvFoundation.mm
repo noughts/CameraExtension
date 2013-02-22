@@ -268,7 +268,7 @@ static BOOL sDevicesEnumerated = false;
         if(mWidth == 640 && [mSession canSetSessionPreset: AVCaptureSessionPreset640x480]){
             mSession.sessionPreset = AVCaptureSessionPreset640x480;
         } else {
-            // 480x360
+            // 852*640
             mSession.sessionPreset = AVCaptureSessionPresetPhoto;
         }
     }
