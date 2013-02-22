@@ -310,6 +310,7 @@ static BOOL sDevicesEnumerated = false;
     
     if ([device isFocusPointOfInterestSupported] && [device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) 
     {
+        [device addObserver:self forKeyPath:@"adjustingFocus" options:NSKeyValueObservingOptionNew context:nil];
         NSError *error;
         if ([device lockForConfiguration:&error]) 
         {
@@ -327,6 +328,14 @@ static BOOL sDevicesEnumerated = false;
     }
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if ([keyPath isEqualToString:@"adjustingFocus"]) {
+        BOOL adjustingFocus = [[change objectForKey:NSKeyValueChangeNewKey] isEqualToNumber:[NSNumber numberWithInt:1]];
+        if (!adjustingFocus) {
+            focusCompleteCallback();
+        }
+    }
+}
 // Additional APIs //
 
 - (void)exposureAtPoint:(float)x y:(float)y
