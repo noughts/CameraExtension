@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">CaptureAndroid</string>
+    <string name="subject">CaptureAndroid</string>
+    <string name="message">CaptureAndroid</string>
 </resources>
