@@ -14,6 +14,8 @@ public class CaptureAndroidApplication extends Application {
 	
 	public Location currentLocation = null;
 	
+	public static boolean isInForeground = false;
+	
 	
 	@Override
 	public void onCreate(){

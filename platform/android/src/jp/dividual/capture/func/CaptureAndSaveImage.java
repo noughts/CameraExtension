@@ -28,6 +28,8 @@ public class CaptureAndSaveImage implements FREFunction {
                 String dirName = args[0].getAsString();
                 int orientation = args[1].getAsInt();
                 String path = cameraSurface.captureAndSaveImage(dirName, orientation);
+                
+                
                 Log.d(TAG, "file path is" + path);
                 CaptureAndroidApplication app = (CaptureAndroidApplication)context.getActivity().getApplication();
                 if(app.currentLocation != null){

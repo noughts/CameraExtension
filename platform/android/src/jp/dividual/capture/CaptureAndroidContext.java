@@ -3,6 +3,7 @@ package jp.dividual.capture;
 import java.util.HashMap;
 import java.util.Map;
 
+import jp.dividual.capture.func.C2DMRegisterFunction;
 import jp.dividual.capture.func.CaptureAndSaveImage;
 import jp.dividual.capture.func.EndCamera;
 import jp.dividual.capture.func.ExposureAtPoint;
@@ -14,6 +15,7 @@ import jp.dividual.capture.func.ListDevices;
 import jp.dividual.capture.func.PutExifLocation;
 import jp.dividual.capture.func.RequestFrame;
 import jp.dividual.capture.func.SetFlashMode;
+import jp.dividual.capture.func.SetIsAppInForegroundFunction;
 import jp.dividual.capture.func.StartCamera;
 import android.app.Activity;
 import android.app.Application;
@@ -95,6 +97,8 @@ public class CaptureAndroidContext extends FREContext {
 		if (mSurface != null) {
 			mSurface.endCamera();
         }
+		
+		C2DMExtension.context = null;
 	}
 
 	@Override
@@ -119,6 +123,10 @@ public class CaptureAndroidContext extends FREContext {
 		//map.put(RegisterPushFunction.KEY, new RegisterPushFunction());
 		map.put(GetLocationFunction.KEY, new GetLocationFunction());
 		map.put(PutExifLocation.KEY, new PutExifLocation());
+		
+		map.put(SetIsAppInForegroundFunction.KEY, new SetIsAppInForegroundFunction());
+		map.put(C2DMRegisterFunction.KEY, new C2DMRegisterFunction());
+		
 		
 		
 		return map;
