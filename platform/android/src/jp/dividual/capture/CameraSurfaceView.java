@@ -125,7 +125,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             setupPreviewSize(width, height);
             setupPictureSize(pictureQuality);
             setupFPS(fps);
-            setExposure(4);
+            //setExposure(4);
  
             Camera.CameraInfo info = new Camera.CameraInfo();
             Camera.getCameraInfo(cameraIndex, info);
@@ -457,7 +457,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         }
     }
     
-    private void setExposure(int exposureCompensation) {
+    public void setExposure(int exposureCompensation) {
         if (mCamera != null) {
             Camera.Parameters params = mCamera.getParameters();
             
