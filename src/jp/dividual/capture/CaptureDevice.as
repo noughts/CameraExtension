@@ -34,6 +34,16 @@ package jp.dividual.capture {
 		private var _fps:int;
 		
 		public function CaptureDevice(cameraIndex:int, width:int, height:int, fps:int=15) {
+			_initExtensionContext();
+
+			_index = cameraIndex;
+			_width = width;
+			_height = height;
+			_fps = fps;
+		}
+
+
+		static private function _initExtensionContext():void{
 			if (!_context) {
 				_context = ExtensionContext.createExtensionContext("jp.dividual.capture", null);
 				if (!_infoBuffer) {
@@ -42,24 +52,14 @@ package jp.dividual.capture {
 					_infoBuffer.length = 64 * 1024;
 				}
 			}
-
-			_index = cameraIndex;
-			_width = width;
-			_height = height;
-			_fps = fps;
 		}
+
+
+
 		
 		// [静的] [読み取り専用] 使用可能なすべてのカメラの名前が含まれるストリング配列です。
 		public static function get names():Array{
-			if (!_context) {
-				_context = ExtensionContext.createExtensionContext("jp.dividual.capture", null);
-			}
-
-			if (!_infoBuffer) {
-				_infoBuffer = new ByteArray();
-				_infoBuffer.endian = Endian.LITTLE_ENDIAN;
-				_infoBuffer.length = 64 * 1024;
-			}
+			_initExtensionContext()
 			
 			_context.call('listDevices', _infoBuffer);
 			
@@ -106,6 +106,12 @@ package jp.dividual.capture {
 			_context.call('focusAtPoint', x, y);
 		}
 
+
+		// 現在のカメラでフラッシュがサポートされているか
+		public function get isFlashSupported():Boolean{
+			var supported:Boolean = _context.call('isFlashSupported') as Boolean;
+			return supported;
+		}
 		
 		// フラッシュの状態を設定
 		public function setFlashMode( flashMode:uint ):void{
