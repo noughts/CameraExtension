@@ -6,10 +6,11 @@ package jp.dividual.capture {
 	import flash.external.ExtensionContext;
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
-
+	
 	public final class CaptureDevice extends EventDispatcher{
 		internal static var _context:ExtensionContext;
-
+		internal static var _infoBuffer:ByteArray;
+		
 		// Flash mode
 		public static const FLASH_MODE_OFF:int = 0;
 		public static const FLASH_MODE_ON:int = 1;
@@ -33,32 +34,42 @@ package jp.dividual.capture {
 		private var _fps:int;
 		
 		public function CaptureDevice(cameraIndex:int, width:int, height:int, fps:int=15) {
-			if (!_context) {
-				_context = ExtensionContext.createExtensionContext("jp.dividual.capture", null);
-			}
+			_initExtensionContext();
 
 			_index = cameraIndex;
 			_width = width;
 			_height = height;
 			_fps = fps;
 		}
+
+
+		static private function _initExtensionContext():void{
+			if (!_context) {
+				_context = ExtensionContext.createExtensionContext("jp.dividual.capture", null);
+				if (!_infoBuffer) {
+					_infoBuffer = new ByteArray();
+					_infoBuffer.endian = Endian.LITTLE_ENDIAN;
+					_infoBuffer.length = 64 * 1024;
+				}
+			}
+		}
+
+
+
 		
 		// [静的] [読み取り専用] 使用可能なすべてのカメラの名前が含まれるストリング配列です。
 		public static function get names():Array{
-			if (!_context) {
-				_context = ExtensionContext.createExtensionContext("jp.dividual.capture", null);
-			}
-
-			var infoBuffer:ByteArray = new ByteArray();
-			infoBuffer.endian = Endian.LITTLE_ENDIAN;
-			infoBuffer.length = 64 * 1024;
-			_context.call('listDevices', infoBuffer);
+			_initExtensionContext()
 			
-			var n:int = infoBuffer.readInt();
+			_context.call('listDevices', _infoBuffer);
+			
+			var n:int = _infoBuffer.readInt();
 			var ret:Array = new Array(n);
 			for (var i:int = 0; i < n; i++) {
-				var nameLength:int = infoBuffer.readInt();
-				var name:String = infoBuffer.readUTFBytes(nameLength);
+				var nameLength:int = _infoBuffer.readInt();
+				var name:String = _infoBuffer.readUTFBytes(nameLength);
+				var available:Boolean = Boolean(_infoBuffer.readInt());
+				var connected:Boolean = Boolean(_infoBuffer.readInt());
 				ret[i] = name;
 			}
 			return ret;
@@ -85,7 +96,7 @@ package jp.dividual.capture {
 		 * Stop capturing video
 		 */
 		public function stopCapturing():void{
-			_context.call('endCamera' );
+			_context.call('endCamera', _index);
 			_context.removeEventListener(StatusEvent.STATUS, onMiscStatus);
 		}
 
@@ -95,10 +106,31 @@ package jp.dividual.capture {
 			_context.call('focusAtPoint', x, y);
 		}
 
+
+		// 現在のカメラで露出補正がサポートされているか？
+		public function isExposureCompensationSupported():Boolean{
+			return _context.call( 'isExposureCompensationSupported' ) as Boolean;
+		}
+		
+		// 現在のカメラのEV値を設定
+		public function setExposureCompensation( val:int ):void{
+			_context.call( 'setExposureCompensation', val );
+		}
+
+		// EV値を取得
+		public function getExposureCompensation():int{
+			return _context.call('getExposureCompensation') as int;
+		}
+
+
+		// 現在のカメラでフラッシュがサポートされているか
+		public function get isFlashSupported():Boolean{
+			return _context.call('isFlashSupported') as Boolean;
+		}
 		
 		// フラッシュの状態を設定
 		public function setFlashMode( flashMode:uint ):void{
-			_context.call( 'setFlashMode', flashMode );
+			_context.call( 'setFlashMode', flashMode);
 		}
 		
 		public function getFlashMode():uint{
@@ -110,7 +142,7 @@ package jp.dividual.capture {
 		// 更新されていたら true を返し、bmp プロパティを書き換える
 		public function requestFrame():Boolean {
 			if (_context != null) {
-				var isNewFrame:int = _context.call('requestFrame', bmp) as int;
+				var isNewFrame:int = _context.call('requestFrame', bmp, _index, _width, _height) as int;
 				return (isNewFrame == 1);
 			} else {
 				return false;
@@ -120,8 +152,8 @@ package jp.dividual.capture {
 
 		// フォーカスと露出を合わせて撮影、フルサイズの画像を端末のカメラロールに保存し、withSound が true ならシャッター音を鳴らす
 		// シャッター音は消せない可能性あり。要相談
-		public function shutter( directoryName:String, pictureOrientation:int, withSound:Boolean=true ):void {
-			_context.call('captureAndSaveImage', directoryName, pictureOrientation);
+		public function shutter(directoryName:String, pictureOrientation:int, withSound:Boolean=true):void {
+			_context.call('captureAndSaveImage', directoryName, pictureOrientation, _index);
 		}
 
 
@@ -137,7 +169,9 @@ package jp.dividual.capture {
 			infoBuffer.endian = Endian.LITTLE_ENDIAN;
 			infoBuffer.length = 64 * 1024;
 			
+			//_context.call('startCamera', _index, _width, _height, _fps, infoBuffer, ANDROID_STILL_IMAGE_QUALITY_BEST);
 			_context.call('flipCamera', infoBuffer);
+			_index = (_index + 1) % 2;
 			
 			var width:int = infoBuffer.readInt();
 			var height:int = infoBuffer.readInt();
