@@ -108,7 +108,7 @@ package jp.dividual.capture {
 
 
 		// 現在のカメラで露出補正がサポートされているか？
-		public function isExposureCompensationSupported():Boolean{
+		public function get isExposureCompensationSupported():Boolean{
 			return _context.call( 'isExposureCompensationSupported' ) as Boolean;
 		}
 		
