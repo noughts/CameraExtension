@@ -107,10 +107,25 @@ package jp.dividual.capture {
 		}
 
 
+		// 現在のカメラで露出補正がサポートされているか？
+		public function isExposureCompensationSupported():Boolean{
+			return _context.call( 'isExposureCompensationSupported' ) as Boolean;
+		}
+		
+		// 現在のカメラのEV値を設定
+		public function setExposureCompensation( val:int ):void{
+			_context.call( 'setExposureCompensation', val );
+		}
+
+		// EV値を取得
+		public function getExposureCompensation():int{
+			return _context.call('getExposureCompensation') as int;
+		}
+
+
 		// 現在のカメラでフラッシュがサポートされているか
 		public function get isFlashSupported():Boolean{
-			var supported:Boolean = _context.call('isFlashSupported') as Boolean;
-			return supported;
+			return _context.call('isFlashSupported') as Boolean;
 		}
 		
 		// フラッシュの状態を設定
