@@ -3,7 +3,7 @@ source $MY_DIR/config.cfg
 
 ANE_FILE=capture.ane
 SWC_FILE=CaptureInterface.swc
-JAR_FILE=captureandroid.jar
+JAR_FILE=android.jar
 LIB_FILE=libcaptureIOS.a
 
 echo "Copying .a file..."
