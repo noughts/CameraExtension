@@ -5,14 +5,16 @@ import java.util.Map;
 
 import jp.dividual.capture.func.CaptureAndSaveImage;
 import jp.dividual.capture.func.EndCamera;
-import jp.dividual.capture.func.ExposureAtPoint;
 import jp.dividual.capture.func.FlipCameraFunction;
 import jp.dividual.capture.func.FocusAtPoint;
+import jp.dividual.capture.func.GetExposureCompensation;
 import jp.dividual.capture.func.GetFlashMode;
 import jp.dividual.capture.func.GetLocationFunction;
+import jp.dividual.capture.func.IsExposureSupported;
 import jp.dividual.capture.func.ListDevices;
 import jp.dividual.capture.func.PutExifLocation;
 import jp.dividual.capture.func.RequestFrame;
+import jp.dividual.capture.func.SetExposureCompensation;
 import jp.dividual.capture.func.SetFlashMode;
 import jp.dividual.capture.func.StartCamera;
 import android.app.Activity;
@@ -73,7 +75,9 @@ public class CaptureAndroidContext extends FREContext {
 		map.put(ListDevices.KEY, new ListDevices());
 		map.put(FlipCameraFunction.KEY, new FlipCameraFunction());
 		map.put(FocusAtPoint.KEY, new FocusAtPoint());		
-		map.put(ExposureAtPoint.KEY, new ExposureAtPoint());
+		map.put(GetExposureCompensation.KEY, new GetExposureCompensation());
+		map.put(SetExposureCompensation.KEY, new SetExposureCompensation());
+		map.put(IsExposureSupported.KEY, new IsExposureSupported());
 		map.put(GetFlashMode.KEY, new GetFlashMode());
 		map.put(SetFlashMode.KEY, new SetFlashMode());
 		map.put(CaptureAndSaveImage.KEY, new CaptureAndSaveImage());
