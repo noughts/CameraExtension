@@ -1,3 +1,4 @@
+.DS_Store
 platform/ios/captureIOS.xcodeproj/xcuserdata/
 platform/ios/captureIOS.xcodeproj/project.xcworkspace/xcuserdata/
 *.tmp
