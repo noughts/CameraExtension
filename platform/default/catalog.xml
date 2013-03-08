@@ -15,16 +15,16 @@
         <dep id="AS3" type="n" /> 
         <dep id="Object" type="i" /> 
       </script>
-      <script name="_fd0119a8a0ff3723579e585aa75bc5a328fec69e457c04b2045f32219f314f06_flash_display_Sprite" mod="1362446750794" signatureChecksum="3768940913" >
-        <def id="_fd0119a8a0ff3723579e585aa75bc5a328fec69e457c04b2045f32219f314f06_flash_display_Sprite" /> 
-        <dep id="flash.system:Security" type="e" /> 
-        <dep id="AS3" type="n" /> 
-        <dep id="flash.display:Sprite" type="i" /> 
-      </script>
       <script name="jp/dividual/capture/CaptureDeviceEvent" mod="1361528794000" signatureChecksum="1219653097" >
         <def id="jp.dividual.capture:CaptureDeviceEvent" /> 
         <dep id="AS3" type="n" /> 
         <dep id="flash.events:Event" type="i" /> 
+      </script>
+      <script name="_025a6a919c698a17ee43a3bd4c89a86681e7223e5e62c6985f64f6a4c70faaf1_flash_display_Sprite" mod="1362722353395" signatureChecksum="1349417565" >
+        <def id="_025a6a919c698a17ee43a3bd4c89a86681e7223e5e62c6985f64f6a4c70faaf1_flash_display_Sprite" /> 
+        <dep id="flash.system:Security" type="e" /> 
+        <dep id="AS3" type="n" /> 
+        <dep id="flash.display:Sprite" type="i" /> 
       </script>
       <script name="jp/dividual/notification/NativeNotification" mod="1361528794000" signatureChecksum="1746034890" >
         <def id="jp.dividual.notification:NativeNotification" /> 
@@ -33,12 +33,13 @@
         <dep id="AS3" type="n" /> 
         <dep id="flash.events:EventDispatcher" type="i" /> 
       </script>
-      <script name="jp/dividual/capture/CaptureDevice" mod="1362446746000" signatureChecksum="945942063" >
+      <script name="jp/dividual/capture/CaptureDevice" mod="1362722349000" signatureChecksum="3487495224" >
         <def id="jp.dividual.capture:CaptureDevice" /> 
         <dep id="flash.utils:ByteArray" type="e" /> 
         <dep id="flash.display:BitmapData" type="e" /> 
         <dep id="flash.utils:Endian" type="e" /> 
         <dep id="trace" type="e" /> 
+        <dep id="flash.system:Capabilities" type="e" /> 
         <dep id="flash.events:StatusEvent" type="e" /> 
         <dep id="jp.dividual.capture:CaptureDeviceEvent" type="e" /> 
         <dep id="flash.external:ExtensionContext" type="e" /> 
@@ -51,7 +52,7 @@
         <dep id="flash.events:EventDispatcher" type="i" /> 
       </script>
       <digests>
-        <digest type="SHA-256" signed="false" value="566552622457528a808975d792e46b66f72b1ef450f86d5c21d7be83e015fa22"   />
+        <digest type="SHA-256" signed="false" value="d83fefcfcebe958fe30de034074eeaa185ad891e305ee1afd8e07c2f619807d0"   />
       </digests>
     </library>
   </libraries>

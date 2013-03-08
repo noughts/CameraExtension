@@ -6,7 +6,8 @@ package jp.dividual.capture {
 	import flash.external.ExtensionContext;
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
-	
+	import flash.system.*;
+
 	public final class CaptureDevice extends EventDispatcher{
 		internal static var _context:ExtensionContext;
 		internal static var _infoBuffer:ByteArray;
@@ -109,7 +110,11 @@ package jp.dividual.capture {
 
 		// 現在のカメラで露出補正がサポートされているか？
 		public function get isExposureCompensationSupported():Boolean{
-			return _context.call( 'isExposureCompensationSupported' ) as Boolean;
+			if( Capabilities.manufacturer.search('Android') > -1 ){
+				return true;
+			}
+			return false;
+			//return _context.call( 'isExposureCompensationSupported' ) as Boolean;
 		}
 		
 		// 現在のカメラのEV値を設定
