@@ -60,7 +60,17 @@ package jp.dividual.capture {
 		
 		// [静的] [読み取り専用] 使用可能なすべてのカメラの名前が含まれるストリング配列です。
 		public static function get names():Array{
-			_initExtensionContext()
+			if (!_context) {
+				_context = ExtensionContext.createExtensionContext("jp.dividual.capture", null);
+			}
+
+			if (!_infoBuffer) {
+				_infoBuffer = new ByteArray();
+				_infoBuffer.endian = Endian.LITTLE_ENDIAN;
+				_infoBuffer.length = 64 * 1024;
+			} else {
+				_infoBuffer.position = 0;
+			}
 			
 			_context.call('listDevices', _infoBuffer);
 			
