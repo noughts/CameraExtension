@@ -119,12 +119,17 @@ package jp.dividual.capture {
 		
 		// 現在のカメラのEV値を設定
 		public function setExposureCompensation( val:int ):void{
-			_context.call( 'setExposureCompensation', val );
+			if( isExposureCompensationSupported ){
+				_context.call( 'setExposureCompensation', val );
+			}
 		}
 
 		// EV値を取得
 		public function getExposureCompensation():int{
-			return _context.call('getExposureCompensation') as int;
+			if( isExposureCompensationSupported ){
+				return _context.call('getExposureCompensation') as int;
+			}
+			return 0;
 		}
 
 
