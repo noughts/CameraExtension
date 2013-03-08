@@ -333,6 +333,8 @@ static BOOL sDevicesEnumerated = false;
         BOOL adjustingFocus = [[change objectForKey:NSKeyValueChangeNewKey] isEqualToNumber:[NSNumber numberWithInt:1]];
         if (!adjustingFocus) {
             focusCompleteCallback();
+            AVCaptureDevice *device = [mCapDeviceInput device];
+            [device removeObserver:self forKeyPath:@"adjustingFocus"];
         }
     }
 }

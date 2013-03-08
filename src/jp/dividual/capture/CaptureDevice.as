@@ -59,6 +59,8 @@ package jp.dividual.capture {
 				_infoBuffer = new ByteArray();
 				_infoBuffer.endian = Endian.LITTLE_ENDIAN;
 				_infoBuffer.length = 64 * 1024;
+			} else {
+				_infoBuffer.position = 0;
 			}
 			
 			_context.call('listDevices', _infoBuffer);
