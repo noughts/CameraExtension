@@ -22,8 +22,8 @@ public class GetExposureCompensation implements FREFunction {
          	CaptureAndroidContext ctx = (CaptureAndroidContext)context;
          	CameraSurfaceView surfaceView = ctx.getCameraSurface();
              if (surfaceView != null) {
-             	//surfaceView.setExposure(exposureCompensation); 
-            	 ret = FREObject.newObject(1);
+             	int currentExposureCompensation = surfaceView.getExposure(); 
+            	 ret = FREObject.newObject(currentExposureCompensation);
              }
          } catch(Exception e) {
              Log.i(TAG, "Error: " + e.toString());

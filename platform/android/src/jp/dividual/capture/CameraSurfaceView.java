@@ -235,6 +235,19 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         bytes.put(mRGBAData, 0, mRGBADataSize);
         mNewFrame = false;
     }
+    
+    public boolean isFlashSupported(){
+    	boolean ret = false;
+    	if(mCamera != null){
+    		List<String> supportedFlashModes = mCamera.getParameters().getSupportedFlashModes();
+    		if(supportedFlashModes == null){
+    			ret = false;
+    		}else{
+    			ret = true;
+    		}
+    	}
+    	return ret;    	
+    }
      
     public String getFlashMode() {
         String ret = null;
@@ -457,6 +470,16 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         }
     }
     
+    public int getExposure() {
+    	int ret = 0;
+        if (mCamera != null) {
+            Camera.Parameters params = mCamera.getParameters();
+            ret = params.getExposureCompensation();
+    		Log.d(TAG, "CurrentExposureCompensation = " + ret); 
+        }
+        return ret;
+    }
+     
     public void setExposure(int exposureCompensation) {
         if (mCamera != null) {
             Camera.Parameters params = mCamera.getParameters();

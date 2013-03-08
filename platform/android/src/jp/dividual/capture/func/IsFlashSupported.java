@@ -22,8 +22,8 @@ public class IsFlashSupported implements FREFunction {
          	CaptureAndroidContext ctx = (CaptureAndroidContext)context;
          	CameraSurfaceView surfaceView = ctx.getCameraSurface();
              if (surfaceView != null) {
-             	//surfaceView.setExposure(exposureCompensation);     
-            	 ret = FREObject.newObject(1);
+             	boolean isSupported = surfaceView.isFlashSupported();
+            	 ret = FREObject.newObject(isSupported);
              }
          } catch(Exception e) {
              Log.i(TAG, "Error: " + e.toString());
