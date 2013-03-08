@@ -11,6 +11,7 @@ import jp.dividual.capture.func.GetExposureCompensation;
 import jp.dividual.capture.func.GetFlashMode;
 import jp.dividual.capture.func.GetLocationFunction;
 import jp.dividual.capture.func.IsExposureSupported;
+import jp.dividual.capture.func.IsFlashSupported;
 import jp.dividual.capture.func.ListDevices;
 import jp.dividual.capture.func.PutExifLocation;
 import jp.dividual.capture.func.RequestFrame;
