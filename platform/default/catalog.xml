@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding ="utf-8"?>
+<swc xmlns="http://www.adobe.com/flash/swccatalog/9">
+  <versions>
+    <swc version="1.2" />
+    <flex version="4.6.0" build="23201" minimumSupportedVersion="3.0.0" />
+  </versions>
+  <features>
+    <feature-script-deps />
+    <feature-files />
+  </features>
+  <libraries>
+    <library path="library.swf">
+      <script name="jp/dividual/capture/CaptureDeviceInfo" mod="1361526298000" signatureChecksum="3865854099" >
+        <def id="jp.dividual.capture:CaptureDeviceInfo" /> 
+        <dep id="AS3" type="n" /> 
+        <dep id="Object" type="i" /> 
+      </script>
+      <script name="_fd0119a8a0ff3723579e585aa75bc5a328fec69e457c04b2045f32219f314f06_flash_display_Sprite" mod="1362446750794" signatureChecksum="3768940913" >
+        <def id="_fd0119a8a0ff3723579e585aa75bc5a328fec69e457c04b2045f32219f314f06_flash_display_Sprite" /> 
+        <dep id="flash.system:Security" type="e" /> 
+        <dep id="AS3" type="n" /> 
+        <dep id="flash.display:Sprite" type="i" /> 
+      </script>
+      <script name="jp/dividual/capture/CaptureDeviceEvent" mod="1361528794000" signatureChecksum="1219653097" >
+        <def id="jp.dividual.capture:CaptureDeviceEvent" /> 
+        <dep id="AS3" type="n" /> 
+        <dep id="flash.events:Event" type="i" /> 
+      </script>
+      <script name="jp/dividual/notification/NativeNotification" mod="1361528794000" signatureChecksum="1746034890" >
+        <def id="jp.dividual.notification:NativeNotification" /> 
+        <dep id="flash.external:ExtensionContext" type="e" /> 
+        <dep id="flash.external:ExtensionContext" type="s" /> 
+        <dep id="AS3" type="n" /> 
+        <dep id="flash.events:EventDispatcher" type="i" /> 
+      </script>
+      <script name="jp/dividual/capture/CaptureDevice" mod="1362446746000" signatureChecksum="945942063" >
+        <def id="jp.dividual.capture:CaptureDevice" /> 
+        <dep id="flash.utils:ByteArray" type="e" /> 
+        <dep id="flash.display:BitmapData" type="e" /> 
+        <dep id="flash.utils:Endian" type="e" /> 
+        <dep id="trace" type="e" /> 
+        <dep id="flash.events:StatusEvent" type="e" /> 
+        <dep id="jp.dividual.capture:CaptureDeviceEvent" type="e" /> 
+        <dep id="flash.external:ExtensionContext" type="e" /> 
+        <dep id="flash.utils:ByteArray" type="s" /> 
+        <dep id="flash.display:BitmapData" type="s" /> 
+        <dep id="flash.events:StatusEvent" type="s" /> 
+        <dep id="jp.dividual.capture:CaptureDeviceEvent" type="s" /> 
+        <dep id="flash.external:ExtensionContext" type="s" /> 
+        <dep id="AS3" type="n" /> 
+        <dep id="flash.events:EventDispatcher" type="i" /> 
+      </script>
+      <digests>
+        <digest type="SHA-256" signed="false" value="566552622457528a808975d792e46b66f72b1ef450f86d5c21d7be83e015fa22"   />
+      </digests>
+    </library>
+  </libraries>
+  <files>
+  </files>
+</swc>

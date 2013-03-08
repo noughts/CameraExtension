@@ -41,5 +41,11 @@
       </applicationDeployment>
     </platform>
     
+    <!-- for PC preview -->
+    <platform name="default"> 
+      <applicationDeployment /> 
+    </platform>
+
+
   </platforms>
 </extension>
