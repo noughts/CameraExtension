@@ -900,6 +900,13 @@ FREObject captureAndSaveImage(FREContext ctx, void* funcData, uint32_t argc, FRE
     return NULL;
 }
 
+
+FREObject isFlashSupported( FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
+    FREObject ret;
+    FRENewObjectFromInt32( 1, &ret );
+    return ret;
+}
+
 //
 // default init routines
 //
@@ -907,7 +914,7 @@ void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, u
 {
     _ctx = ctx;
     
-    *numFunctions = 9;
+    *numFunctions = 10;
 
     FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * (*numFunctions));
 
@@ -946,6 +953,10 @@ void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, u
     func[8].name = (const uint8_t*) "captureAndSaveImage";
     func[8].functionData = NULL;
     func[8].function = &captureAndSaveImage;
+    
+    func[9].name = (const uint8_t*) "isFlashSupported";
+    func[9].functionData = NULL;
+    func[9].function = &isFlashSupported;
     
     *functions = func;
 

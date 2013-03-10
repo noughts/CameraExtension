@@ -11,6 +11,7 @@ import jp.dividual.capture.func.GetExposureCompensation;
 import jp.dividual.capture.func.GetFlashMode;
 import jp.dividual.capture.func.GetLocationFunction;
 import jp.dividual.capture.func.IsExposureSupported;
+import jp.dividual.capture.func.IsFlashSupported;
 import jp.dividual.capture.func.ListDevices;
 import jp.dividual.capture.func.PutExifLocation;
 import jp.dividual.capture.func.RequestFrame;
@@ -78,6 +79,7 @@ public class CaptureAndroidContext extends FREContext {
 		map.put(GetExposureCompensation.KEY, new GetExposureCompensation());
 		map.put(SetExposureCompensation.KEY, new SetExposureCompensation());
 		map.put(IsExposureSupported.KEY, new IsExposureSupported());
+		map.put(IsFlashSupported.KEY, new IsFlashSupported());
 		map.put(GetFlashMode.KEY, new GetFlashMode());
 		map.put(SetFlashMode.KEY, new SetFlashMode());
 		map.put(CaptureAndSaveImage.KEY, new CaptureAndSaveImage());

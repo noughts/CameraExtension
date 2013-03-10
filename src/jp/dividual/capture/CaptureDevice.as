@@ -6,7 +6,8 @@ package jp.dividual.capture {
 	import flash.external.ExtensionContext;
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
-	
+	import flash.system.*;
+
 	public final class CaptureDevice extends EventDispatcher{
 		internal static var _context:ExtensionContext;
 		internal static var _infoBuffer:ByteArray;
@@ -59,7 +60,17 @@ package jp.dividual.capture {
 		
 		// [静的] [読み取り専用] 使用可能なすべてのカメラの名前が含まれるストリング配列です。
 		public static function get names():Array{
-			_initExtensionContext()
+			if (!_context) {
+				_context = ExtensionContext.createExtensionContext("jp.dividual.capture", null);
+			}
+
+			if (!_infoBuffer) {
+				_infoBuffer = new ByteArray();
+				_infoBuffer.endian = Endian.LITTLE_ENDIAN;
+				_infoBuffer.length = 64 * 1024;
+			} else {
+				_infoBuffer.position = 0;
+			}
 			
 			_context.call('listDevices', _infoBuffer);
 			
@@ -109,17 +120,26 @@ package jp.dividual.capture {
 
 		// 現在のカメラで露出補正がサポートされているか？
 		public function get isExposureCompensationSupported():Boolean{
-			return _context.call( 'isExposureCompensationSupported' ) as Boolean;
+			if( Capabilities.manufacturer.search('Android') > -1 ){
+				return true;
+			}
+			return false;
+			//return _context.call( 'isExposureCompensationSupported' ) as Boolean;
 		}
 		
 		// 現在のカメラのEV値を設定
 		public function setExposureCompensation( val:int ):void{
-			_context.call( 'setExposureCompensation', val );
+			if( isExposureCompensationSupported ){
+				_context.call( 'setExposureCompensation', val );
+			}
 		}
 
 		// EV値を取得
 		public function getExposureCompensation():int{
-			return _context.call('getExposureCompensation') as int;
+			if( isExposureCompensationSupported ){
+				return _context.call('getExposureCompensation') as int;
+			}
+			return 0;
 		}
 
 
@@ -152,8 +172,12 @@ package jp.dividual.capture {
 
 		// フォーカスと露出を合わせて撮影、フルサイズの画像を端末のカメラロールに保存し、withSound が true ならシャッター音を鳴らす
 		// シャッター音は消せない可能性あり。要相談
-		public function shutter(directoryName:String, pictureOrientation:int, withSound:Boolean=true):void {
-			_context.call('captureAndSaveImage', directoryName, pictureOrientation, _index);
+		public function shutter(directoryName:String, pictureOrientation:int, withSound:Boolean=true, lat:Number=99999, lng:Number=99999 ):void {
+			if( lat==99999 && lng==99999 ){
+				_context.call( 'captureAndSaveImage', directoryName, pictureOrientation, _index );
+			} else {
+				_context.call( 'captureAndSaveImage', directoryName, pictureOrientation, _index, lat, lng );
+			}
 		}
 
 
