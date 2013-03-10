@@ -11,6 +11,7 @@ mkdir -p ./bin/tmp/platform/ios/
 mkdir -p ./bin/tmp/platform/default/
 cp ${LIB_PATH}/${LIB_FILE} ./platform/ios/
 cp -r ./platform/ios/ ./bin/tmp/platform/ios/
+cp -r ./platform/android/ ./bin/tmp/platform/android/
 echo "Extracting .swf file..."
 unzip -o ./bin/${SWC_FILE} library.swf -d ./bin/tmp/platform/ios/
 unzip -o ./bin/${SWC_FILE} library.swf -d ./bin/tmp/platform/android/
