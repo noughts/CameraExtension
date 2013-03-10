@@ -30,6 +30,7 @@ package jp.dividual.capture {
 		public var bmp:BitmapData;
 
 		private var _index:int;
+		public function get index():int{ return _index }
 		private var _width:int;
 		private var _height:int;
 		private var _fps:int;
@@ -161,12 +162,11 @@ package jp.dividual.capture {
 		// フレーム画像を要求する
 		// 更新されていたら true を返し、bmp プロパティを書き換える
 		public function requestFrame():Boolean {
-			if (_context != null) {
-				var isNewFrame:int = _context.call('requestFrame', bmp, _index, _width, _height) as int;
-				return (isNewFrame == 1);
-			} else {
+			if (_context == null) {
 				return false;
 			}
+			var isNewFrame:int = _context.call('requestFrame', bmp, _index, _width, _height) as int;
+			return (isNewFrame == 1);
 		}
 		
 
