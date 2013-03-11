@@ -343,6 +343,8 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             Camera.Parameters params = mCamera.getParameters();
             params.setRotation(degrees);
             mCamera.setParameters(params);
+            
+            Log.d(TAG, "orientation set to " + degrees);
         }
     }
      
