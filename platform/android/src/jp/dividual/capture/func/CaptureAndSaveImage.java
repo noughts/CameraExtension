@@ -20,15 +20,13 @@ public class CaptureAndSaveImage implements FREFunction {
 	@Override
 	public FREObject call(FREContext context, FREObject[] args) {
 		FREObject ret = null;
-		Log.d(TAG, "captureAndSaveImage called 2");
+		Log.d(TAG, "captureAndSaveImage called");
         try {
         	CaptureAndroidContext ctx = (CaptureAndroidContext)context;
         	CameraSurfaceView cameraSurface = ctx.getCameraSurface();
             if(cameraSurface != null && 1 < args.length) {
                 String dirName = args[0].getAsString();
                 int orientation = args[1].getAsInt();
-                
-                Log.d(TAG, "calling captureAndSaveImage");
                 
                 String path = cameraSurface.captureAndSaveImage(dirName, orientation);
                 
@@ -49,7 +47,7 @@ public class CaptureAndSaveImage implements FREFunction {
             	Log.d(TAG, "cameraSurface is null or args.length < 2");
             }
         } catch(Exception e) {
-            Log.i(TAG, "captureAndSaveImage Error: " + e.toString());
+            Log.i(TAG, "Error: " + e.toString());
             e.printStackTrace();
         }
         return ret;
