@@ -267,6 +267,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     }
  
     public String captureAndSaveImage(final String directoryName, int orientation) {
+    	Log.d(TAG, "captureAndSaveImage");
         if (mCamera != null && !mImageSaving) {
             mImageSaving = true;
             // Save to local file
@@ -275,6 +276,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
                 Log.d(TAG, "Error creating media file, check storage permissions");
                 return null;
             }
+            Log.d(TAG, "calling setCameraOrientation");
             setCameraOrientation(orientation);
             // Take picture after auto-focus
             mCamera.autoFocus(new Camera.AutoFocusCallback() {
