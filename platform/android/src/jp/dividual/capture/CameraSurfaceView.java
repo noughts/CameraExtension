@@ -276,7 +276,6 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
                 Log.d(TAG, "Error creating media file, check storage permissions");
                 return null;
             }
-            Log.d(TAG, "calling setCameraOrientation");
             setCameraOrientation(orientation);
             // Take picture after auto-focus
             mCamera.autoFocus(new Camera.AutoFocusCallback() {
@@ -334,13 +333,16 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             Camera.getCameraInfo(mCameraId, info);
             int degrees = 0;
             switch (orientation) {
-                case Surface.ROTATION_0: degrees = 0; break;
-                case Surface.ROTATION_90: degrees = 90; break;
-                case Surface.ROTATION_180: degrees = 180; break;
-                case Surface.ROTATION_270: degrees = 270; break;
+                case Surface.ROTATION_0: degrees = 90; break;
+                case Surface.ROTATION_90: degrees = 180; break;
+                case Surface.ROTATION_180: degrees = 270; break;
+                case Surface.ROTATION_270: degrees = 0; break;
             }
             if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 degrees = 360 - degrees;  // compensate the mirror
+                if(degrees == 360){
+                	degrees = 0;
+                }
             }
             Camera.Parameters params = mCamera.getParameters();
             params.setRotation(degrees);
