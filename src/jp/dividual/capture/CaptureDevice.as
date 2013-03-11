@@ -26,6 +26,9 @@ package jp.dividual.capture {
 		public static const ROTATION_270:int = 3;
 				
 		public var bmp:BitmapData;
+		private var _flipped_bd:BitmapData
+		private var _flipped_mat:Matrix
+
 
 		private var _index:int;
 		public function get index():int{ return _index }
@@ -105,6 +108,8 @@ package jp.dividual.capture {
 			_width = width;
 			_height = height;
 			bmp = new BitmapData(_width, _height, false, 0x0);
+			_flipped_bd = new BitmapData( _width, _height );
+			_flipped_mat = new Matrix( -1, 0, 0, 1, _width, 0);
 			_context.addEventListener(StatusEvent.STATUS, onMiscStatus);
 		}
 		
@@ -172,14 +177,10 @@ package jp.dividual.capture {
 			var isNewFrame:int = _context.call('requestFrame', bmp, _index, _width, _height) as int;
 
 			// Android でフロントカメラだったら上下反転
-				trace( _index, Capabilities.manufacturer.search('Android') )
 			if( _index==1 && Capabilities.manufacturer.search('Android') > -1 ){
-				var flipped:BitmapData = new BitmapData( bmp.width, bmp.height );
-				var mat:Matrix = new Matrix( 1, 0, 0, -1, 0, bmp.height);
-				flipped.draw( bmp, mat, null, null, null, true );
-				bmp = flipped.clone();
-				//flipped.dispose();
-				trace( "flipped" )
+				_flipped_bd.draw( bmp, _flipped_mat );
+				bmp = _flipped_bd.clone();
+				//bmp = _flipped_bd;
 			}
 
 			return (isNewFrame == 1);
