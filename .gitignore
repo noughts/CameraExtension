@@ -9,3 +9,5 @@ platform/ios/library.swf
 
 platform/android/bin/*
 !platform/android/bin/android.jar
+
+/capture.ane
