@@ -8,6 +8,4 @@ platform/android/library.swf
 platform/ios/library.swf
 
 platform/android/bin/*
-!platform/android/bin/android.jar
-
-/capture.ane
+!platform/android/bin/captureandroid.jar

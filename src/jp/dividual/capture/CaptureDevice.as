@@ -1,12 +1,10 @@
 package jp.dividual.capture {
-	import flash.display.BitmapData;
-	import flash.events.Event;
-	import flash.events.EventDispatcher;
-	import flash.events.StatusEvent;
+	import flash.display.*;
+	import flash.events.*;
 	import flash.external.ExtensionContext;
-	import flash.utils.ByteArray;
-	import flash.utils.Endian;
+	import flash.utils.*;
 	import flash.system.*;
+	import flash.geom.*;
 
 	public final class CaptureDevice extends EventDispatcher{
 		internal static var _context:ExtensionContext;
@@ -28,6 +26,9 @@ package jp.dividual.capture {
 		public static const ROTATION_270:int = 3;
 				
 		public var bmp:BitmapData;
+		private var _flipped_bd:BitmapData
+		private var _flipped_mat:Matrix
+
 
 		private var _index:int;
 		public function get index():int{ return _index }
@@ -107,6 +108,8 @@ package jp.dividual.capture {
 			_width = width;
 			_height = height;
 			bmp = new BitmapData(_width, _height, false, 0x0);
+			_flipped_bd = new BitmapData( _width, _height );
+			_flipped_mat = new Matrix( -1, 0, 0, 1, _width, 0);
 			_context.addEventListener(StatusEvent.STATUS, onMiscStatus);
 		}
 		
@@ -172,6 +175,14 @@ package jp.dividual.capture {
 				return false;
 			}
 			var isNewFrame:int = _context.call('requestFrame', bmp, _index, _width, _height) as int;
+
+			// Android でフロントカメラだったら上下反転
+			if( _index==1 && Capabilities.manufacturer.search('Android') > -1 ){
+				_flipped_bd.draw( bmp, _flipped_mat );
+				bmp = _flipped_bd.clone();
+				//bmp = _flipped_bd;
+			}
+
 			return (isNewFrame == 1);
 		}
 		
