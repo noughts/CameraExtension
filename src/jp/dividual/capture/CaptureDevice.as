@@ -36,6 +36,9 @@ package jp.dividual.capture {
 		private var _isFocusing:Boolean = false;
 		public function get isFocusing():Boolean{ return _isFocusing }
 
+		// 起動シーケンス中かどうか
+		private var _nowLaunching:Boolean = false;
+
 
 		private var _index:int;
 		public function get index():int{ return _index }
@@ -105,6 +108,11 @@ package jp.dividual.capture {
 		 * Begin capturing video
 		 */
 		public function startCapturing():void {
+			if( _nowLaunching ){
+				trace( "CaptureDevice startCapturing", "すでに起動処理中です。カメラが起動するまでお待ちください。" );
+				return;
+			}
+			_nowLaunching = true;
 			var infoBuffer:ByteArray = new ByteArray();
 			infoBuffer.endian = Endian.LITTLE_ENDIAN;
 			infoBuffer.length = 64 * 1024;
@@ -248,6 +256,8 @@ package jp.dividual.capture {
 				_isFocusing = false;
 				dispatchEvent(new CaptureDeviceEvent(CaptureDeviceEvent.EVENT_FOCUS_COMPLETE));
 			} else if (e.code == CaptureDeviceEvent.EVENT_PREVIEW_READY) {
+				_nowLaunching = false;
+
 				// bitmapData を初期化
 				trace( "BitmapData を初期化します。", _width, _height )
 				if( _normal_bd ){
