@@ -114,6 +114,7 @@ package jp.dividual.capture {
 			var height:int = infoBuffer.readInt();
 			_width = width;
 			_height = height;
+			trace( "CaptureDevice startCamera", _width, _height )
 			_context.addEventListener(StatusEvent.STATUS, onMiscStatus);
 		}
 		
@@ -248,6 +249,7 @@ package jp.dividual.capture {
 				dispatchEvent(new CaptureDeviceEvent(CaptureDeviceEvent.EVENT_FOCUS_COMPLETE));
 			} else if (e.code == CaptureDeviceEvent.EVENT_PREVIEW_READY) {
 				// bitmapData を初期化
+				trace( "BitmapData を初期化します。", _width, _height )
 				if( _normal_bd ){
 					_normal_bd.dispose();
 				}
