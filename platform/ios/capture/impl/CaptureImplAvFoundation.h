@@ -95,6 +95,6 @@ class CaptureImplAvFoundationDevice : public Capture::Device {
 - (int32_t)getFlashMode;
 - (bool)isAdjustingFocus;
 - (bool)isAdjustingExposure;
-- (void)captureAndSaveImage:(int)orientation;
+- (void)captureAndSaveImage:(int)orientation latitude:(double)lat longitude:(double)lng;
 - (bool)isFlashSupported;
 @end

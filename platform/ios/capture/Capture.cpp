@@ -195,10 +195,10 @@ void Capture::captureStillImage(void (*callback)(const uint8_t *data, int32_t si
 #endif
 }
 
-void Capture::captureAndSaveImage(int orientation)
+void Capture::captureAndSaveImage(int orientation, double lat, double lng)
 {
 #if defined( _ENV_COCOA_TOUCH_ )
-    [((::CapturePlatformImpl*)mObj->mImpl) captureAndSaveImage:orientation];
+    [((::CapturePlatformImpl*)mObj->mImpl) captureAndSaveImage:orientation latitude:lat longitude:lng];
 #endif
 }
 

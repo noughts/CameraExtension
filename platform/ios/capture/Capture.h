@@ -71,7 +71,7 @@ class Capture
     static DeviceRef                        findDeviceByNameContains( const std::string &nameFragment );
     static bool                             supportsSaveToCameraRoll();
     static bool                             saveToCameraRoll(const char* fileName, const uint8_t *data, int32_t size, int32_t orientation);
-    void                                    captureAndSaveImage(int orientation);
+    void                                    captureAndSaveImage(int orientation, double lat, double lng);
     bool                                    isFlashSupported();
 #if defined( _ENV_COCOA_ )
     typedef std::string DeviceIdentifier;

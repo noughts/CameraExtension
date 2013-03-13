@@ -886,16 +886,19 @@ void imageSavedCallback()
 
 FREObject captureAndSaveImage(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
-    int32_t id, orientation;
+    int32_t orientation;
+    double lat, lng;
     FREGetObjectAsInt32(argv[1], &orientation);
-
+    FREGetObjectAsDouble(argv[3], &lat);
+    FREGetObjectAsDouble(argv[4], &lng);
+    
     CCapture *cap = NULL;
     if (0 <= active_cam_id && active_cam_id < MAX_ACTIVE_CAMS) {
         cap = active_cams[active_cam_id];
     }
     
     if(cap) {
-        captureAndSave(cap, orientation);
+        captureAndSave(cap, orientation, lat, lng);
     }
     return NULL;
 }

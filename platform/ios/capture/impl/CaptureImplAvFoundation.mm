@@ -116,8 +116,10 @@ static BOOL sDevicesEnumerated = false;
     } else if (orientation == 3) {
         meta = 8; // 270CW
     }
-    NSNumber *nsOrientation = [NSNumber numberWithInt:meta];
-    NSDictionary *metadata = [NSDictionary dictionaryWithObject:nsOrientation forKey:(NSString *)kCGImagePropertyOrientation];
+
+    NSDictionary *metadata = [NSDictionary dictionaryWithObjectsAndKeys:
+                              [NSNumber numberWithInt:meta], (NSString *)kCGImagePropertyOrientation,
+                              nil];
     [library writeImageDataToSavedPhotosAlbum:dataForJPGFile metadata:metadata completionBlock:^(NSURL *assetURL, NSError *error)
      {
          if (error) 
@@ -513,7 +515,7 @@ static BOOL sDevicesEnumerated = false;
     return mIsCapturing;
 }
 
-- (void)captureAndSaveImage:(int)orientation {
+- (void)captureAndSaveImage:(int)orientation latitude:(double)lat longitude:(double)lng {
     AVCaptureConnection *connection = [CaptureImplAvFoundation connectionWithMediaType:AVMediaTypeVideo fromConnections:[photoOutput connections]];
     [photoOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
         NSData *data = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
@@ -531,11 +533,17 @@ static BOOL sDevicesEnumerated = false;
         } else if (orientation == 3) {
             meta = 8; // 270CW
         }
-        NSNumber *nsOrientation = [NSNumber numberWithInt:meta];
-        NSDictionary *metadata = [NSDictionary dictionaryWithObject:nsOrientation forKey:(NSString *)kCGImagePropertyOrientation];
+        NSDictionary *gpsDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                [NSNumber numberWithDouble:lat], (NSString *)kCGImagePropertyGPSLatitude,
+                                [NSNumber numberWithDouble:lng], (NSString *)kCGImagePropertyGPSLongitude,
+                                nil];
+        NSDictionary *metadata = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  [NSNumber numberWithInt:meta], (NSString *)kCGImagePropertyOrientation,
+                                  gpsDic, (NSString *)kCGImagePropertyGPSDictionary,
+                                  nil];
         [library writeImageToSavedPhotosAlbum:image.CGImage metadata:metadata
                               completionBlock:^(NSURL *assetURL, NSError *error) {
-                                  NSLog(@"Saved: %@", assetURL.absoluteString);
+                                  NSLog(@"Saved: %@ %d %f %f", assetURL.absoluteString, meta, lat, lng);
                                   imageSavedCallback();
             
         }];

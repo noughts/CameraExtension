@@ -38,7 +38,7 @@ extern "C" {
     CAPI(int) captureSupportsSaveToCameraRoll();
     CAPI(int) captureSaveToCameraRoll( const char *fileName, const uint8_t* data, int size, int orientation);
     
-    CAPI(void) captureAndSave(CCapture *capture, int orientation);
+    CAPI(void) captureAndSave(CCapture *capture, int orientation, double lat, double lng);
     CAPI(bool) captureIsFlashSupported(CCapture *capture);
 #ifdef __cplusplus
 }

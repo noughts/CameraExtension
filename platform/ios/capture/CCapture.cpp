@@ -182,9 +182,9 @@ C_IMPL int captureSaveToCameraRoll( const char *fileName, const uint8_t* data, i
     return (Capture::saveToCameraRoll(fileName, data, size, orientation));
 }
 
-C_IMPL void captureAndSave(CCapture *capture, int orientation)
+C_IMPL void captureAndSave(CCapture *capture, int orientation, double lat, double lng)
 {
-    c_to_cpp(capture).captureAndSaveImage(orientation);
+    c_to_cpp(capture).captureAndSaveImage(orientation, lat, lng);
 }
 
 C_IMPL bool captureIsFlashSupported(CCapture *capture)
