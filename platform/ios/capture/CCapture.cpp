@@ -186,3 +186,8 @@ C_IMPL void captureAndSave(CCapture *capture, int orientation)
 {
     c_to_cpp(capture).captureAndSaveImage(orientation);
 }
+
+C_IMPL bool captureIsFlashSupported(CCapture *capture)
+{
+    return (c_to_cpp(capture).isFlashSupported());
+}

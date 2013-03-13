@@ -542,6 +542,14 @@ static BOOL sDevicesEnumerated = false;
     }];
 }
 
+- (bool)isFlashSupported {
+    AVCaptureDevice *device = [mCapDeviceInput device];
+    if (device && device.hasFlash) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 - (void)captureStillImage:(Capture *)f method:(imageCallback)call 
 {

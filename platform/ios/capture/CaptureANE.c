@@ -902,9 +902,19 @@ FREObject captureAndSaveImage(FREContext ctx, void* funcData, uint32_t argc, FRE
 
 
 FREObject isFlashSupported( FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ){
-    FREObject ret;
-    FRENewObjectFromInt32( 1, &ret );
-    return ret;
+    CCapture *cap = NULL;
+    if (0 <= active_cam_id && active_cam_id < MAX_ACTIVE_CAMS) {
+        cap = active_cams[active_cam_id];
+    }
+    
+    if (cap)
+    {
+        bool flash = captureIsFlashSupported(cap);
+        FREObject ret;
+        FRENewObjectFromBool(flash, &ret);
+        return ret;
+    }
+    return NULL;
 }
 
 //

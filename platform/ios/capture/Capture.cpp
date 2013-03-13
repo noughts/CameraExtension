@@ -172,6 +172,11 @@ bool Capture::isAdjustingExposure()
 #endif
 }
 
+bool Capture::isFlashSupported()
+{
+    return [((::CapturePlatformImpl*)mObj->mImpl) isFlashSupported];
+}
+
 void (*callBack)(const uint8_t *data, int32_t size) = NULL;
 
 void Capture::stillImageCallback(const uint8_t *data, int32_t size)

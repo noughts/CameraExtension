@@ -96,4 +96,5 @@ class CaptureImplAvFoundationDevice : public Capture::Device {
 - (bool)isAdjustingFocus;
 - (bool)isAdjustingExposure;
 - (void)captureAndSaveImage:(int)orientation;
+- (bool)isFlashSupported;
 @end

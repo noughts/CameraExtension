@@ -72,6 +72,7 @@ class Capture
     static bool                             supportsSaveToCameraRoll();
     static bool                             saveToCameraRoll(const char* fileName, const uint8_t *data, int32_t size, int32_t orientation);
     void                                    captureAndSaveImage(int orientation);
+    bool                                    isFlashSupported();
 #if defined( _ENV_COCOA_ )
     typedef std::string DeviceIdentifier;
 #else
