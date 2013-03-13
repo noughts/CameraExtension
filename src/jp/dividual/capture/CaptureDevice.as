@@ -200,7 +200,7 @@ package jp.dividual.capture {
 
 		// android で撮影した画像に位置情報を入れる
 		public function putExifLocation( filePath:String, lat:Number, lng:Number ):void{
-			if( && Capabilities.manufacturer.search('Android') > -1 ){
+			if( Capabilities.manufacturer.search('Android') > -1 ){
 				_context.call('putExifLocation', filePath, lat, lng );
 			}
 		}
