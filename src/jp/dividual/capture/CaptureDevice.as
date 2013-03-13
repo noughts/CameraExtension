@@ -26,7 +26,7 @@ package jp.dividual.capture {
 		public static const ROTATION_270:int = 3;
 
 		private var _current_bd:BitmapData;
-		public function get current_bd:BitmapData{ return _current_bd }
+		public function get current_bd():BitmapData{ return _current_bd }
 				
 		private var _normal_bd:BitmapData;
 		private var _flipped_bd:BitmapData
@@ -114,9 +114,6 @@ package jp.dividual.capture {
 			var height:int = infoBuffer.readInt();
 			_width = width;
 			_height = height;
-			_normal_bd = new BitmapData(_width, _height, false, 0x0);
-			_flipped_bd = new BitmapData( _width, _height );
-			_flipped_mat = new Matrix( -1, 0, 0, 1, _width, 0);
 			_context.addEventListener(StatusEvent.STATUS, onMiscStatus);
 		}
 		
@@ -183,15 +180,13 @@ package jp.dividual.capture {
 				return false;
 			}
 			var isNewFrame:int = _context.call('requestFrame', _normal_bd, _index, _width, _height) as int;
-
-			//trace( _index, Capabilities.manufacturer  )
+			_current_bd = _normal_bd;
 
 			// Android でフロントカメラだったら上下反転
 			if( _index==1 && Capabilities.manufacturer.search('Android') > -1 ){
-				trace( "上下フリップします" )
+				//trace( "上下フリップします" )
 				_flipped_bd.draw( _normal_bd, _flipped_mat );
-				//_normal_bd = _flipped_bd.clone();
-				_normal_bd = _flipped_bd;
+				_current_bd = _flipped_bd;
 			}
 
 			return (isNewFrame == 1);
@@ -235,7 +230,6 @@ package jp.dividual.capture {
 			var height:int = infoBuffer.readInt();
 			_width = width;
 			_height = height;
-			_normal_bd = new BitmapData(_width, _height, false, 0x0);
 		}
 
 
@@ -253,6 +247,17 @@ package jp.dividual.capture {
 				_isFocusing = false;
 				dispatchEvent(new CaptureDeviceEvent(CaptureDeviceEvent.EVENT_FOCUS_COMPLETE));
 			} else if (e.code == CaptureDeviceEvent.EVENT_PREVIEW_READY) {
+				// bitmapData を初期化
+				if( _normal_bd ){
+					_normal_bd.dispose();
+				}
+				if( _flipped_bd ){
+					_flipped_bd.dispose();
+				}
+				_normal_bd = new BitmapData( _width, _height );
+				_flipped_bd = new BitmapData( _width, _height );
+				_flipped_mat = new Matrix( -1, 0, 0, 1, _width, 0);
+				_current_bd = _normal_bd
 				dispatchEvent(new CaptureDeviceEvent(CaptureDeviceEvent.EVENT_PREVIEW_READY));
 			} else if (e.code == CaptureDeviceEvent.EVENT_IMAGE_SAVED) {
 				var ne:CaptureDeviceEvent = new CaptureDeviceEvent( CaptureDeviceEvent.EVENT_IMAGE_SAVED )
