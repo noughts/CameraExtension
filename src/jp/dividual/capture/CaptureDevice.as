@@ -24,8 +24,11 @@ package jp.dividual.capture {
 		public static const ROTATION_90:int = 1;
 		public static const ROTATION_180:int = 2;
 		public static const ROTATION_270:int = 3;
+
+		private var _current_bd:BitmapData;
+		public function get current_bd:BitmapData{ return _current_bd }
 				
-		public var bmp:BitmapData;
+		private var _normal_bd:BitmapData;
 		private var _flipped_bd:BitmapData
 		private var _flipped_mat:Matrix
 
@@ -107,7 +110,7 @@ package jp.dividual.capture {
 			var height:int = infoBuffer.readInt();
 			_width = width;
 			_height = height;
-			bmp = new BitmapData(_width, _height, false, 0x0);
+			_normal_bd = new BitmapData(_width, _height, false, 0x0);
 			_flipped_bd = new BitmapData( _width, _height );
 			_flipped_mat = new Matrix( -1, 0, 0, 1, _width, 0);
 			_context.addEventListener(StatusEvent.STATUS, onMiscStatus);
@@ -169,18 +172,21 @@ package jp.dividual.capture {
 		}
 		
 		// フレーム画像を要求する
-		// 更新されていたら true を返し、bmp プロパティを書き換える
+		// 更新されていたら true を返し、_normal_bd プロパティを書き換える
 		public function requestFrame():Boolean {
 			if (_context == null) {
 				return false;
 			}
-			var isNewFrame:int = _context.call('requestFrame', bmp, _index, _width, _height) as int;
+			var isNewFrame:int = _context.call('requestFrame', _normal_bd, _index, _width, _height) as int;
+
+			//trace( _index, Capabilities.manufacturer  )
 
 			// Android でフロントカメラだったら上下反転
 			if( _index==1 && Capabilities.manufacturer.search('Android') > -1 ){
-				_flipped_bd.draw( bmp, _flipped_mat );
-				bmp = _flipped_bd.clone();
-				//bmp = _flipped_bd;
+				trace( "上下フリップします" )
+				_flipped_bd.draw( _normal_bd, _flipped_mat );
+				//_normal_bd = _flipped_bd.clone();
+				_normal_bd = _flipped_bd;
 			}
 
 			return (isNewFrame == 1);
@@ -218,7 +224,7 @@ package jp.dividual.capture {
 			var height:int = infoBuffer.readInt();
 			_width = width;
 			_height = height;
-			bmp = new BitmapData(_width, _height, false, 0x0);
+			_normal_bd = new BitmapData(_width, _height, false, 0x0);
 		}
 
 
