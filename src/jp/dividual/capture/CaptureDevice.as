@@ -29,6 +29,10 @@ package jp.dividual.capture {
 		private var _flipped_bd:BitmapData
 		private var _flipped_mat:Matrix
 
+		// フォーカス中かどうか
+		private var _isFocusing:Boolean = false;
+		public function get isFocusing():Boolean{ return _isFocusing }
+
 
 		private var _index:int;
 		public function get index():int{ return _index }
@@ -124,6 +128,7 @@ package jp.dividual.capture {
 
 		// フォーカスと露出を調整します
 		public function focusAndExposureAtPoint(x:Number = 0.5, y:Number = 0.5):void {
+			_isFocusing = true;
 			_context.call('focusAtPoint', x, y);
 		}
 
@@ -190,6 +195,10 @@ package jp.dividual.capture {
 		// フォーカスと露出を合わせて撮影、フルサイズの画像を端末のカメラロールに保存し、withSound が true ならシャッター音を鳴らす
 		// シャッター音は消せない可能性あり。要相談
 		public function shutter(directoryName:String, pictureOrientation:int, withSound:Boolean=true, lat:Number=99999, lng:Number=99999 ):void {
+			if( _isFocusing ){
+				trace( "CaptureDevice.shutter は、フォーカス中では無効です" );
+				return;
+			}
 			if( lat==99999 && lng==99999 ){
 				_context.call( 'captureAndSaveImage', directoryName, pictureOrientation, _index );
 			} else {
@@ -200,7 +209,9 @@ package jp.dividual.capture {
 
 		// android で撮影した画像に位置情報を入れる
 		public function putExifLocation( filePath:String, lat:Number, lng:Number ):void{
-			_context.call('putExifLocation', filePath, lat, lng );
+			if( Capabilities.manufacturer.search('Android') > -1 ){
+				_context.call('putExifLocation', filePath, lat, lng );
+			}
 		}
 
 		
@@ -233,6 +244,7 @@ package jp.dividual.capture {
 		internal function onMiscStatus(e:StatusEvent):void {
 			trace( "onMiscStatus", e.code, e.level )
 			if (e.code == CaptureDeviceEvent.EVENT_FOCUS_COMPLETE) {
+				_isFocusing = false;
 				dispatchEvent(new CaptureDeviceEvent(CaptureDeviceEvent.EVENT_FOCUS_COMPLETE));
 			} else if (e.code == CaptureDeviceEvent.EVENT_PREVIEW_READY) {
 				dispatchEvent(new CaptureDeviceEvent(CaptureDeviceEvent.EVENT_PREVIEW_READY));
