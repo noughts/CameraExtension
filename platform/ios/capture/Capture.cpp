@@ -32,6 +32,12 @@ const vector<Capture::DeviceRef>& Capture::getDevices( bool forceRefresh )
 #endif
 }
 
+Capture::DeviceRef Capture::getDeviceAt(int index)
+{
+    const vector<DeviceRef> &devices = getDevices();
+    return devices.at(index);
+}
+
 Capture::DeviceRef Capture::findDeviceByName( const string &name )
 {
     const vector<DeviceRef> &devices = getDevices();

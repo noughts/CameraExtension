@@ -69,6 +69,7 @@ class Capture
     static const std::vector<DeviceRef>&    getDevices( bool forceRefresh = false );
     static DeviceRef                        findDeviceByName( const std::string &name );
     static DeviceRef                        findDeviceByNameContains( const std::string &nameFragment );
+    static DeviceRef                        getDeviceAt(int index);
     static bool                             supportsSaveToCameraRoll();
     static bool                             saveToCameraRoll(const char* fileName, const uint8_t *data, int32_t size, int32_t orientation);
     void                                    captureAndSaveImage(int orientation, double lat, double lng);

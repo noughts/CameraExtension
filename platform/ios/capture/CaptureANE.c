@@ -224,16 +224,8 @@ FREObject getCapture(FREContext ctx, void* funcData, uint32_t argc, FREObject ar
         return NULL;
     }
     
-    CCapture* cap = NULL;
-    if (camera_index == 1) {
-        char camera_name[] = "Front Camera";
-        cap = createCameraCapture(w, h, camera_name, frameRate );
-        active_cam_front = true;
-    } else {
-        char camera_name[] = "Back Camera";
-        cap = createCameraCapture(w, h, camera_name, frameRate );
-        active_cam_front = false;
-    }
+    CCapture* cap = createCameraCapture(w, h, camera_index, frameRate);
+    active_cam_front = (camera_index == 1);
     
     if(!cap)
     {
@@ -703,12 +695,10 @@ FREObject flipCamera(FREContext ctx, void* funcData, uint32_t argc, FREObject ar
     
     CCapture* cap = NULL;
     if (active_cam_front) {
-        char camera_name[] = "Back Camera";
-        cap = createCameraCapture(active_cam_width, active_cam_height, camera_name, active_cam_fps);
+        cap = createCameraCapture(active_cam_width, active_cam_height, 0, active_cam_fps);
         active_cam_front = false;
     } else {
-        char camera_name[] = "Front Camera";
-        cap = createCameraCapture(active_cam_width, active_cam_height, camera_name, active_cam_fps);
+        cap = createCameraCapture(active_cam_width, active_cam_height, 1, active_cam_fps);
         active_cam_front = true;
     }
     

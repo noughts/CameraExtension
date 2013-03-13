@@ -42,9 +42,9 @@ inline const CCapture* cpp_to_c(const Capture& ref)
 // C Interface
 //
 
-C_IMPL CCapture * createCameraCapture (int width, int height, char *deviceName, int frameRate)
+C_IMPL CCapture * createCameraCapture (int width, int height, int index, int frameRate)
 {
-    Capture::DeviceRef device = Capture::findDeviceByNameContains( deviceName );
+    Capture::DeviceRef device = Capture::getDeviceAt(index);
     
     try {
             // some cams may actually work even if not available

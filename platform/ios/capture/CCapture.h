@@ -15,7 +15,7 @@ extern "C" {
 
     typedef struct CCapture CCapture;
 
-    CAPI(CCapture*) createCameraCapture (int width, int height, char *deviceName, int frameRate );
+    CAPI(CCapture*) createCameraCapture (int width, int height, int index, int frameRate );
     CAPI(void) releaseCapture( CCapture* capture );
     CAPI(int) getCaptureDevices( CaptureDeviceInfo* result, int forceRefresh );
     CAPI(void) captureStart( CCapture* capture );
