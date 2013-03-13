@@ -31,6 +31,7 @@ extern void statusBarTappedCallback();
 extern void previewReadyCallback();
 extern void imageSavedCallback();
 extern void focusCompleteCallback();
+extern void captureImageReadyCallback();
 
 class CaptureImplAvFoundationDevice : public Capture::Device {
  public:

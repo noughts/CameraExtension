@@ -884,6 +884,11 @@ void imageSavedCallback()
     FREDispatchStatusEventAsync(_ctx, (const uint8_t *)"IMAGE_SAVED", (const uint8_t *)"0");
 }
 
+void captureImageReadyCallback()
+{
+    FREDispatchStatusEventAsync(_ctx, (const uint8_t *)"CAPTURE_IMAGE_READY", (const uint8_t *)"0");
+}
+
 FREObject captureAndSaveImage(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 {
     int32_t orientation;

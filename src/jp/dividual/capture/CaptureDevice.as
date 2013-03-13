@@ -277,6 +277,10 @@ package jp.dividual.capture {
 				var ne:CaptureDeviceEvent = new CaptureDeviceEvent( CaptureDeviceEvent.EVENT_IMAGE_SAVED )
 				ne.data = e.level;
 				dispatchEvent( ne );
+			} else if (e.code == CaptureDeviceEvent.EVENT_CAPTURE_IMAGE_READY) {
+				var evt:CaptureDeviceEvent = new CaptureDeviceEvent(CaptureDeviceEvent.EVENT_CAPTURE_IMAGE_READY);
+				evt.data = e.level;
+				dispatchEvent(evt);				
 			}
 		}
 

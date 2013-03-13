@@ -518,6 +518,7 @@ static BOOL sDevicesEnumerated = false;
 - (void)captureAndSaveImage:(int)orientation latitude:(double)lat longitude:(double)lng {
     AVCaptureConnection *connection = [CaptureImplAvFoundation connectionWithMediaType:AVMediaTypeVideo fromConnections:[photoOutput connections]];
     [photoOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
+        captureImageReadyCallback();
         NSData *data = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
         UIImage *image = [UIImage imageWithData:data];
         ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
@@ -534,8 +535,8 @@ static BOOL sDevicesEnumerated = false;
             meta = 8; // 270CW
         }
         NSDictionary *gpsDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                [NSNumber numberWithDouble:lat], (NSString *)kCGImagePropertyGPSLatitude,
-                                [NSNumber numberWithDouble:lng], (NSString *)kCGImagePropertyGPSLongitude,
+                                [NSNumber numberWithFloat:lat], (NSString *)kCGImagePropertyGPSLatitude,
+                                [NSNumber numberWithFloat:lng], (NSString *)kCGImagePropertyGPSLongitude,
                                 nil];
         NSDictionary *metadata = [NSDictionary dictionaryWithObjectsAndKeys:
                                   [NSNumber numberWithInt:meta], (NSString *)kCGImagePropertyOrientation,
