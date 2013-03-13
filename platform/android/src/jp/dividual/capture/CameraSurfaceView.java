@@ -341,8 +341,14 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 degrees = 360 - degrees;  // compensate the mirror
                 if(degrees == 360){
+                	Log.d(TAG, "Camera facing front, and degree is 360");
                 	degrees = 0;
                 }
+            }else{
+            	if(degrees == 360){
+            		Log.d(TAG, "Camera facing rear, but degrees is 360");
+            		degrees = 0;
+            	}
             }
             Camera.Parameters params = mCamera.getParameters();
             params.setRotation(degrees);

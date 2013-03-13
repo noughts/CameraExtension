@@ -17,9 +17,7 @@ public class CaptureAndroidApplication extends Application {
 		super.onCreate();
 		
 		Log.i(TAG, "Taking over app class!");
-		
-
-		
+				
 		
 	}	
 	
