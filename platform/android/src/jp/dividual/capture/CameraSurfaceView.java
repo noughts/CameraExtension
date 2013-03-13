@@ -153,6 +153,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
      
     public void endCamera() {
         if (mCamera != null) {
+        	/*
             try {
                 mCamera.setPreviewDisplay(null);
             } catch (IOException e) {
@@ -163,6 +164,11 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
                 mCamera.release();
                 mCamera = null;
             }
+            */
+            stopPreview();
+            mCamera.setPreviewCallback(null);
+            mCamera.release();
+            mCamera = null;
         }
          
         mYUVData = null;
