@@ -78,6 +78,7 @@ package jp.dividual.capture {
 			}
 
 			if( _names ){
+				trace( "CaptureDevice names", "キャッシュを返します" )
 				return _names;
 			}
 
@@ -90,6 +91,7 @@ package jp.dividual.capture {
 			}
 			
 			_context.call('listDevices', _infoBuffer);
+			trace( "CaptureDevice names infoBuffer.length", _infoBuffer.length )
 			
 			var n:int = _infoBuffer.readInt();
 			var ret:Array = new Array(n);
