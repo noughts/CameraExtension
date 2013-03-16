@@ -534,9 +534,15 @@ static BOOL sDevicesEnumerated = false;
         } else if (orientation == 3) {
             meta = 8; // 270CW
         }
+        
+        NSString *latRef = (lat < 0.0) ? @"S" : @"N";
+        NSString *lngRef = (lng < 0.0) ? @"W" : @"E";
+
         NSDictionary *gpsDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                [NSNumber numberWithFloat:lat], (NSString *)kCGImagePropertyGPSLatitude,
-                                [NSNumber numberWithFloat:lng], (NSString *)kCGImagePropertyGPSLongitude,
+                                latRef, (NSString *)kCGImagePropertyGPSLatitudeRef,
+                                [NSNumber numberWithFloat:fabs(lat)], (NSString *)kCGImagePropertyGPSLatitude,
+                                lngRef, (NSString *)kCGImagePropertyGPSLongitudeRef,
+                                [NSNumber numberWithFloat:fabs(lng)], (NSString *)kCGImagePropertyGPSLongitude,
                                 nil];
         NSDictionary *metadata = [NSDictionary dictionaryWithObjectsAndKeys:
                                   [NSNumber numberWithInt:meta], (NSString *)kCGImagePropertyOrientation,
@@ -544,7 +550,6 @@ static BOOL sDevicesEnumerated = false;
                                   nil];
         [library writeImageToSavedPhotosAlbum:image.CGImage metadata:metadata
                               completionBlock:^(NSURL *assetURL, NSError *error) {
-                                  NSLog(@"Saved: %@ %d %f %f", assetURL.absoluteString, meta, lat, lng);
                                   imageSavedCallback();
             
         }];
