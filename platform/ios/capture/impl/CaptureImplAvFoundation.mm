@@ -258,6 +258,19 @@ static BOOL sDevicesEnumerated = false;
         }
     }
     
+    // Set mirroring on front camera
+    AVCaptureConnection *connection = nil;
+    for (AVCaptureConnection *conn in mCapOutput.connections) {
+        if (conn.active) {
+            connection = conn;
+            break;
+        }
+    }
+    if ([mCapDevice position] == AVCaptureDevicePositionFront) {
+        connection.videoMirrored = YES;
+        connection.videoOrientation = AVCaptureVideoOrientationLandscapeRight;
+    }
+    
     mSession.sessionPreset = AVCaptureSessionPresetPhoto;
     /*
     if(mWidth == 0)
