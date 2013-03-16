@@ -258,30 +258,38 @@ static BOOL sDevicesEnumerated = false;
         }
     }
     
+    mSession.sessionPreset = AVCaptureSessionPresetPhoto;
+    /*
     if(mWidth == 0)
     {
         mSession.sessionPreset = AVCaptureSessionPresetPhoto;
+        NSLog(@"[AVCaptureSession] Session Preset Photo");
     }
     else if(mWidth < 480)
     {
         mSession.sessionPreset = AVCaptureSessionPresetLow;
+        NSLog(@"[AVCaptureSession] Session Preset Low");
     }
     else if (mWidth < 1024) {
         if(mWidth == 640 && [mSession canSetSessionPreset: AVCaptureSessionPreset640x480]){
             mSession.sessionPreset = AVCaptureSessionPreset640x480;
+            NSLog(@"[AVCaptureSession] Session Preset 640x480");
         } else {
             // 852*640
             mSession.sessionPreset = AVCaptureSessionPresetPhoto;
+            NSLog(@"[AVCaptureSession] Session Preset Photo (852x640)");
         }
     }
     else {
         if(mWidth == 1280 && [mSession canSetSessionPreset: AVCaptureSessionPreset1280x720]){
             mSession.sessionPreset = AVCaptureSessionPreset1280x720;
+            NSLog(@"[AVCaptureSession] Session Preset 1280x720");
         } else {
             mSession.sessionPreset = AVCaptureSessionPresetHigh;
+            NSLog(@"[AVCaptureSession] Session Preset High");
         }
     }
-    
+    */
     // Setup the still image file output
     photoOutput = [[[AVCaptureStillImageOutput alloc] init] autorelease];
     // raw BGRA for still image
